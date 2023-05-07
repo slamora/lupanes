@@ -1,5 +1,5 @@
 django==4.2.1
-django-bootstrap4==22.3
+django-bootstrap5==23.1
 django-environ
 django-extensions
 dj_database_url==1.2.0
