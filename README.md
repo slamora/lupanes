@@ -29,3 +29,10 @@ NOTE: you can generate a secure random private key by running
 ```sh
 python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"
 ```
+
+4. Install development tools (precommit)
+```sh
+# with virtual environment active
+pip install -r requirements-dev.txt
+pre-commit install
+```
