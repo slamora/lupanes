@@ -1,3 +1,8 @@
-from django.shortcuts import render
+from django.views.generic.edit import CreateView
 
-# Create your views here.
+from lupanes.models import DeliveryNote
+
+
+class DeliveryNoteCreateView(CreateView):
+    model = DeliveryNote
+    fields = ["customer", "product", "quantity"]
