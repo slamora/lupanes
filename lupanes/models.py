@@ -21,9 +21,19 @@ class Producer(models.Model):
 
 
 class Product(models.Model):
+    class Unit(models.TextChoices):
+        BOTE = "bote"
+        DOCENA = "docena"
+        GARRAFA = "garrafa"
+        KG = "Kg"
+        PAQUETE = "paquete"
+        LITRO = "litro"
+        UNIDAD = "unidad"
+
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True)
     producer = models.ForeignKey("Producer", on_delete=models.PROTECT)
+    unit = models.CharField(max_length=16, choices=Unit.choices)
     is_active = models.BooleanField(default=True)
 
 
