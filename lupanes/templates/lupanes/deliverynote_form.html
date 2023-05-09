@@ -1,11 +1,7 @@
+{% extends "lupanes/base.html" %}
 {% load django_bootstrap5 %}
 
-{% bootstrap_css %}
-{% bootstrap_javascript %}
-
-{# Display django.contrib.messages as Bootstrap alerts #}
-{% bootstrap_messages %}
-
+{% block main %}
 <h1>Nuevo albarán</h1>
 
 <form action="/url/to/submit/" method="post" class="form">
@@ -15,3 +11,5 @@
 
   {% bootstrap_button button_type="submit" content="Enviar" %}
 </form>
+
+{% endblock main %}
