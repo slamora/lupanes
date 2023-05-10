@@ -15,7 +15,9 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.urls import include, path
+from django.views.generic import RedirectView
 
 urlpatterns = [
     path('', include('lupanes.urls')),
+    path('', RedirectView.as_view(pattern_name='lupanes:customer-login', permanent=True), name='root_index'),
 ]
