@@ -2,7 +2,27 @@
 {% load django_bootstrap5 %}
 
 {% block main %}
-<h1>Nuevo albarán</h1>
+<h1>La compra de hoy</h1>
+<table class="table">
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>Producto</th>
+      <th>Cantidad</th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for note in deliverynotes_today %}
+    <tr>
+      <td>{{ forloop.counter }}</td>
+      <td>{{ note.product.name }}</td>
+      <td>{{ note.quantity }} {{ note.product.unit }}</td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+
+<h2>Nuevo albarán</h2>
 
 <form class="form" method="post">
   {% csrf_token %}

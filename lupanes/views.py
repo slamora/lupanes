@@ -1,5 +1,6 @@
 from typing import Any, Dict
 
+from django.utils import timezone
 from django.core.exceptions import PermissionDenied
 from django.http import HttpRequest, HttpResponse
 from django.urls import reverse_lazy
@@ -36,3 +37,11 @@ class DeliveryNoteCreateView(CreateView):
         kwargs = super().get_form_kwargs()
         kwargs["customer"] = self.customer
         return kwargs
+
+    def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        today = timezone.now().date()
+        context["deliverynotes_today"] = DeliveryNote.objects.filter(
+            customer=self.customer, date__date=today,
+        )
+        return context
