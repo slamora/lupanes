@@ -9,6 +9,16 @@ from lupanes.forms import CustomerAuthForm, DeliveryNoteCreateForm
 from lupanes.models import Customer, DeliveryNote
 
 
+class CustomerLoginView(FormView):
+    form_class = CustomerAuthForm
+    template_name = "lupanes/customer_login.html"
+    success_url = reverse_lazy("lupanes:deliverynote-new")
+
+    def form_valid(self, form: Any) -> HttpResponse:
+        self.request.session["customer_id"] = form.customer_id
+        return super().form_valid(form)
+
+
 class DeliveryNoteCreateView(CreateView):
     form_class = DeliveryNoteCreateForm
     model = DeliveryNote
@@ -26,13 +36,3 @@ class DeliveryNoteCreateView(CreateView):
         kwargs = super().get_form_kwargs()
         kwargs["customer"] = self.customer
         return kwargs
-
-
-class CustomerLoginView(FormView):
-    form_class = CustomerAuthForm
-    template_name = "lupanes/customer_login.html"
-    success_url = reverse_lazy("lupanes:deliverynote-new")
-
-    def form_valid(self, form: Any) -> HttpResponse:
-        self.request.session["customer_id"] = form.customer_id
-        return super().form_valid(form)
