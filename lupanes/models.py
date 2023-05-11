@@ -7,6 +7,9 @@ class Customer(models.Model):
     email = models.EmailField()
     is_active = models.BooleanField(default=True)
 
+    def __str__(self) -> str:
+        return f"{self.name} ({self.email})"
+
 
 class DeliveryNote(models.Model):
     """Albarán"""
@@ -18,6 +21,9 @@ class DeliveryNote(models.Model):
 
 class Producer(models.Model):
     name = models.CharField(max_length=255, unique=True)
+
+    def __str__(self) -> str:
+        return f"{self.name}"
 
 
 class Product(models.Model):
@@ -36,8 +42,16 @@ class Product(models.Model):
     unit = models.CharField(max_length=16, choices=Unit.choices)
     is_active = models.BooleanField(default=True)
 
+    def __str__(self) -> str:
+        if self.producer.name:
+            return f"{self.name} ({self.producer.name})"
+        return f"{self.name}"
+
 
 class ProductPrice(models.Model):
     value = models.DecimalField(max_digits=5, decimal_places=2)
     start_date = models.DateField()
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
+
+    def __str__(self) -> str:
+        return f"{self.product.name} - {self.value} ({self.start_date})"
