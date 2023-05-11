@@ -3,7 +3,7 @@ from django.db import models
 
 class Customer(models.Model):
     """Nevera"""
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=255, unique=True)
     email = models.EmailField()
     is_active = models.BooleanField(default=True)
 
@@ -17,7 +17,7 @@ class DeliveryNote(models.Model):
 
 
 class Producer(models.Model):
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=255, unique=True)
 
 
 class Product(models.Model):
@@ -30,7 +30,7 @@ class Product(models.Model):
         LITRO = "litro"
         UNIDAD = "unidad"
 
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=255, unique=True)
     description = models.TextField(blank=True)
     producer = models.ForeignKey("Producer", on_delete=models.PROTECT)
     unit = models.CharField(max_length=16, choices=Unit.choices)
