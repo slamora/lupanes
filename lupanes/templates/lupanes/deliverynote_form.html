@@ -2,7 +2,13 @@
 {% load django_bootstrap5 %}
 
 {% block main %}
-<h1>La compra de hoy</h1>
+<div class="d-flex justify-content-between">
+  <h1>La compra de hoy</h1>
+  <div>
+    <h4 class="badge bg-success">{{ form.customer.name }}</h4>
+    <a class="btn btn-link" href="#TODO-logout">salir</a>
+  </div>
+</div>
 <table class="table">
   <thead>
     <tr>
