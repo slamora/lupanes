@@ -5,17 +5,17 @@ from lupanes.models import Customer, DeliveryNote
 
 
 class CustomerAuthForm(forms.Form):
-    email = forms.EmailField()
+    name = forms.CharField()
 
-    def clean_email(self):
-        data = self.cleaned_data["email"]
+    def clean_name(self):
+        name = self.cleaned_data["name"].strip()
         try:
-            customer = Customer.objects.get(email=data)
+            customer = Customer.objects.get(name__iexact=name)
         except Customer.DoesNotExist:
-            raise ValidationError("No se ha encontrado ninguna nevera con el correo proporcionado.")
+            raise ValidationError("No se ha encontrado ninguna nevera con el nombre proporcionado.")
         else:
             self.customer_id = customer.pk
-        return data
+        return customer.name
 
 
 class DeliveryNoteCreateForm(forms.ModelForm):
