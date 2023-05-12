@@ -23,7 +23,7 @@
     </tr>
   </thead>
   <tbody>
-  {% for note in deliverynotes_today %}
+    {% for note in deliverynotes_today %}
     <tr>
       <td>{{ forloop.counter }}</td>
       <td>{{ note.product.name }}</td>
@@ -33,7 +33,7 @@
         <a class="btn btn-outline-danger" href="{% url 'lupanes:deliverynote-delete' note.pk %}">eliminar</a>
       </td>
     </tr>
-  {% endfor %}
+    {% endfor %}
   </tbody>
 </table>
 
@@ -49,3 +49,12 @@
 </form>
 
 {% endblock main %}
+
+{% block extra_script %}
+<script>
+  // In your Javascript (external .js resource or <script> tag)
+  $(document).ready(function () {
+    $('#id_product').select2();
+  });
+</script>
+{% endblock %}
