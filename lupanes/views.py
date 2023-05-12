@@ -1,13 +1,14 @@
 from typing import Any, Dict
+from django.db.models import QuerySet
 
 from django.utils import timezone
-from django.core.exceptions import PermissionDenied
-from django.http import HttpRequest, HttpResponse
+from django.http import HttpResponse
 from django.urls import reverse_lazy
-from django.views.generic.edit import CreateView, FormView
+from django.views.generic.edit import CreateView, FormView, UpdateView
 
 from lupanes.forms import CustomerAuthForm, DeliveryNoteCreateForm
-from lupanes.models import Customer, DeliveryNote
+from lupanes.models import DeliveryNote
+from lupanes.mixins import CustomerAuthMixin
 
 
 class CustomerLoginView(FormView):
@@ -20,18 +21,10 @@ class CustomerLoginView(FormView):
         return super().form_valid(form)
 
 
-class DeliveryNoteCreateView(CreateView):
+class DeliveryNoteCreateView(CustomerAuthMixin, CreateView):
     form_class = DeliveryNoteCreateForm
     model = DeliveryNote
     success_url = reverse_lazy("lupanes:deliverynote-new")
-
-    def dispatch(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
-        customer_id = self.request.session.get("customer_id")
-        try:
-            self.customer = Customer.objects.get(pk=customer_id)
-        except Customer.DoesNotExist:
-            raise PermissionDenied()
-        return super().dispatch(request, *args, **kwargs)
 
     def get_form_kwargs(self) -> Dict[str, Any]:
         kwargs = super().get_form_kwargs()
@@ -45,3 +38,13 @@ class DeliveryNoteCreateView(CreateView):
             customer=self.customer, date__date=today,
         )
         return context
+
+
+class DeliveryNoteUpdateView(CustomerAuthMixin, UpdateView):
+    model = DeliveryNote
+    fields = ["product", "quantity"]
+    success_url = reverse_lazy("lupanes:deliverynote-new")
+
+    def get_queryset(self) -> QuerySet[Any]:
+        today = timezone.now().date()
+        return DeliveryNote.objects.filter(customer=self.customer, date__date=today)
