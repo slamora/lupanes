@@ -2,6 +2,10 @@
 {% load django_bootstrap5 %}
 
 {% block main %}
+{% if object %}
+<h2>Editar albarán</h2>
+
+{% else %}
 <div class="d-flex justify-content-between">
   <h1>La compra de hoy</h1>
   <div>
@@ -24,13 +28,17 @@
       <td>{{ forloop.counter }}</td>
       <td>{{ note.product.name }}</td>
       <td>{{ note.quantity }} {{ note.product.unit }}</td>
-      <td><a class="btn btn-outline-warning" href="{% url 'lupanes:deliverynote-edit' note.pk %}">editar</a></td>
+      <td>
+        <a class="btn btn-outline-warning" href="{% url 'lupanes:deliverynote-edit' note.pk %}">editar</a>
+        <a class="btn btn-outline-danger" href="{% url 'lupanes:deliverynote-delete' note.pk %}">eliminar</a>
+      </td>
     </tr>
   {% endfor %}
   </tbody>
 </table>
 
 <h2>Nuevo albarán</h2>
+{% endif %}
 
 <form class="form" method="post">
   {% csrf_token %}
