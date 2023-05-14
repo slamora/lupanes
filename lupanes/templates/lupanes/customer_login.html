@@ -1,0 +1,15 @@
+{% extends "lupanes/base.html" %}
+{% load django_bootstrap5 %}
+
+{% block main %}
+<h1>Acceso</h1>
+<p>Introduce el nombre de tu nevera</p>
+<form class="form" method="post">
+  {% csrf_token %}
+
+  {% bootstrap_form form %}
+
+  {% bootstrap_button button_type="submit" content="Acceder" %}
+</form>
+
+{% endblock main %}

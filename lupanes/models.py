@@ -1,3 +1,64 @@
 from django.db import models
 
-# Create your models here.
+
+class Customer(models.Model):
+    """Nevera"""
+    name = models.CharField(max_length=255, unique=True)
+    email = models.EmailField()
+    is_active = models.BooleanField(default=True)
+
+    def __str__(self) -> str:
+        return f"{self.name} ({self.email})"
+
+
+class DeliveryNote(models.Model):
+    """Albarán"""
+    customer = models.ForeignKey("Customer", on_delete=models.PROTECT)
+    date = models.DateTimeField(auto_now_add=True)
+    product = models.ForeignKey("Product", on_delete=models.PROTECT)
+    quantity = models.DecimalField("Cantidad", max_digits=6, decimal_places=3)
+
+
+class Producer(models.Model):
+    name = models.CharField(max_length=255, unique=True)
+
+    def __str__(self) -> str:
+        return f"{self.name}"
+
+
+class Product(models.Model):
+    class Unit(models.TextChoices):
+        BOTE = "bote"
+        DOCENA = "docena"
+        GARRAFA = "garrafa"
+        KG = "Kg"
+        PAQUETE = "paquete"
+        LITRO = "litro"
+        UNIDAD = "unidad"
+
+        @classmethod
+        def fractional_units(cls):
+            return [cls.KG]
+
+    name = models.CharField(max_length=255, unique=True)
+    description = models.TextField(blank=True)
+    producer = models.ForeignKey("Producer", on_delete=models.PROTECT)
+    unit = models.CharField(max_length=16, choices=Unit.choices)
+    is_active = models.BooleanField(default=True)
+
+    def __str__(self) -> str:
+        if self.producer.name:
+            return f"{self.name} ({self.producer.name})"
+        return f"{self.name}"
+
+    def unit_accept_decimals(self):
+        return self.unit in Product.Unit.fractional_units()
+
+
+class ProductPrice(models.Model):
+    value = models.DecimalField(max_digits=5, decimal_places=2)
+    start_date = models.DateField()
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+
+    def __str__(self) -> str:
+        return f"{self.product.name} - {self.value} ({self.start_date})"
