@@ -1,14 +1,16 @@
 from typing import Any, Dict
-from django.db.models import QuerySet
 
-from django.utils import timezone
-from django.http import HttpResponse
+from django.db.models import QuerySet
+from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.urls import reverse_lazy
-from django.views.generic.edit import CreateView, DeleteView, FormView, UpdateView
+from django.utils import timezone
+from django.views.generic import DetailView
+from django.views.generic.edit import (CreateView, DeleteView, FormView,
+                                       UpdateView)
 
 from lupanes.forms import CustomerAuthForm, DeliveryNoteCreateForm
-from lupanes.models import DeliveryNote
 from lupanes.mixins import CustomerAuthMixin
+from lupanes.models import DeliveryNote, Product
 
 
 class CustomerLoginView(FormView):
@@ -57,3 +59,19 @@ class DeliveryNoteDeleteView(CustomerAuthMixin, DeleteView):
     def get_queryset(self) -> QuerySet[Any]:
         today = timezone.now().date()
         return DeliveryNote.objects.filter(customer=self.customer, date__date=today)
+
+
+class ProductAjaxView(DetailView):
+    model = Product
+
+    def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> JsonResponse:
+        obj = self.get_object()
+        data = {
+            "pk": obj.pk,
+            "name": obj.name,
+            "unit": {
+                "name": obj.unit,
+                "accept_decimals": obj.unit_accept_decimals(),
+            }
+        }
+        return JsonResponse(data=data)

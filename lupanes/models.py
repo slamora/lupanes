@@ -36,6 +36,10 @@ class Product(models.Model):
         LITRO = "litro"
         UNIDAD = "unidad"
 
+        @classmethod
+        def fractional_units(cls):
+            return [cls.KG]
+
     name = models.CharField(max_length=255, unique=True)
     description = models.TextField(blank=True)
     producer = models.ForeignKey("Producer", on_delete=models.PROTECT)
@@ -46,6 +50,9 @@ class Product(models.Model):
         if self.producer.name:
             return f"{self.name} ({self.producer.name})"
         return f"{self.name}"
+
+    def unit_accept_decimals(self):
+        return self.unit in Product.Unit.fractional_units()
 
 
 class ProductPrice(models.Model):

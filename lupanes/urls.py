@@ -9,4 +9,5 @@ urlpatterns = [
     path('albaran/new/', views.DeliveryNoteCreateView.as_view(), name='deliverynote-new'),
     path('albaran/<int:pk>/edit/', views.DeliveryNoteUpdateView.as_view(), name='deliverynote-edit'),
     path('albaran/<int:pk>/delete/', views.DeliveryNoteDeleteView.as_view(), name='deliverynote-delete'),
+    path('product/<int:pk>/', views.ProductAjaxView.as_view(), name='product-detail'),
 ]

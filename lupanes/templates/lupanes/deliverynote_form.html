@@ -45,6 +45,11 @@
 
   {% bootstrap_form form %}
 
+  <div class="mb-3">
+    <label class="form-label" for="id_unit">Unidad</label>
+    <input type="text" disabled class="form-control" id="id_unit">
+  </div>
+
   {% bootstrap_button button_type="submit" content="Enviar" %}
 </form>
 
@@ -52,9 +57,21 @@
 
 {% block extra_script %}
 <script>
-  // In your Javascript (external .js resource or <script> tag)
+  // TODO(@slamora): move code to a .js file
   $(document).ready(function () {
     $('#id_product').select2();
+
+    $("#id_product").on("change", function() {
+      $.getJSON(
+        // TODO(@slamora): avoid hardcoded URL
+        "/product/" + this.value + "/",
+        function( data ) {
+          $("#id_unit").val(data["unit"]["name"]);
+          let step = (data["unit"]["accept_decimals"] ? "0.001" : "1");
+          $("#id_quantity").attr("step", step);
+        },
+      );
+    });
   });
 </script>
 {% endblock %}
