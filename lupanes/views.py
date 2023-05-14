@@ -4,7 +4,7 @@ from django.db.models import QuerySet
 from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.urls import reverse_lazy
 from django.utils import timezone
-from django.views.generic import DetailView
+from django.views.generic import DetailView, RedirectView
 from django.views.generic.edit import (CreateView, DeleteView, FormView,
                                        UpdateView)
 
@@ -21,6 +21,17 @@ class CustomerLoginView(FormView):
     def form_valid(self, form: Any) -> HttpResponse:
         self.request.session["customer_id"] = form.customer_id
         return super().form_valid(form)
+
+
+class CustomerLogoutView(RedirectView):
+    pattern_name = "lupanes:customer-login"
+
+    def get_redirect_url(self, *args, **kwargs):
+        try:
+            del self.request.session["customer_id"]
+        except KeyError:
+            pass
+        return super().get_redirect_url(*args, **kwargs)
 
 
 class DeliveryNoteCreateView(CustomerAuthMixin, CreateView):
