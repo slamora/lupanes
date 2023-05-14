@@ -8,13 +8,41 @@
 
   <title>Albaranes | Lupierra</title>
 
-  {% bootstrap_css %}
+  <!-- Favicon -->
+  <link href="img/favicon.ico" rel="icon" />
+
+  <!-- Google Web Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500&family=Quicksand:wght@600;700&display=swap"
+    rel="stylesheet" />
+
+  <!-- Icon Font Stylesheet -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet" />
+
+  <!-- Libraries Stylesheet -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css"
     integrity="sha256-zaSoHBhwFdle0scfGEFUCwggPN7F+ip9XRglo8IWb4w=" crossorigin="anonymous">
+
+  <!-- Customized Bootstrap Stylesheet -->
+  <link href="{% static 'zoofari/css/bootstrap.min.css' %}" rel="stylesheet" />
+
+  <!-- Template Zoofari Stylesheet -->
+  <link href="{% static 'zoofari/css/style.css' %}" rel="stylesheet" />
 
 </head>
 
 <body class="{{ request.resolver_match.url_name }}">
+  <!-- Spinner Start -->
+  <div id="spinner"
+    class="show bg-white position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex align-items-center justify-content-center">
+    <div class="spinner-border text-primary" style="width: 3rem; height: 3rem" role="status">
+      <span class="sr-only">Loading...</span>
+    </div>
+  </div>
+  <!-- Spinner End -->
   <section>
     {% bootstrap_messages %}
   </section>
@@ -25,11 +53,18 @@
     </div>
   </main><!-- End #main -->
 
+  <!-- Back to Top -->
+  <a href="#" class="btn btn-lg btn-primary btn-lg-square back-to-top"><i class="bi bi-arrow-up"></i></a>
+
+  <!-- JavaScript Libraries -->
   {% bootstrap_javascript %}
   <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.0/dist/jquery.min.js"
     integrity="sha256-2Pmvv0kuTBOenSvLm6bvfBSSHrUJ+3A7x6P5Ebd07/g=" crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"
     integrity="sha256-9yRP/2EFlblE92vzCA10469Ctd0jT48HnmmMw5rJZrA=" crossorigin="anonymous"></script>
+
+  <!-- Template Javascript -->
+  <script src="{% static 'zoofari/js/main.js' %}"></script>
   {% block extra_script %}{% endblock %}
 </body>
 
