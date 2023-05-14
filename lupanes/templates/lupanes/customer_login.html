@@ -2,14 +2,21 @@
 {% load django_bootstrap5 %}
 
 {% block main %}
-<h1>Acceso</h1>
-<p>Introduce el nombre de tu nevera</p>
-<form class="form" method="post">
-  {% csrf_token %}
 
-  {% bootstrap_form form %}
+<div class="card" style="width: 20rem; margin: 2rem auto;">
+  <div class="card-body">
+    <h1 class="card-title">Iniciar sesión</h1>
+    <h6 class="card-subtitle mb-2 text-muted">Introduce el nombre de tu nevera</h6>
+    <div class="card-text">
+      <form class="form" method="post">
+        {% csrf_token %}
 
-  {% bootstrap_button button_type="submit" content="Acceder" %}
-</form>
+        {% bootstrap_form form %}
+
+        {% bootstrap_button button_type="submit" content="Acceder" %}
+      </form>
+    </div>
+  </div>
+</div>
 
 {% endblock main %}
