@@ -36,3 +36,17 @@ python -c "from django.core.management.utils import get_random_secret_key; print
 pip install -r requirements-dev.txt
 pre-commit install
 ```
+
+## postgres - prepare your database
+Prepare your PostGres database (create database, user and grant permissions):
+
+```sh
+sudo su - postgres
+psql
+```
+
+```sql
+CREATE DATABASE albaranes;
+CREATE USER lupierra WITH PASSWORD 'VerYs3cretP4$$';
+GRANT ALL PRIVILEGES ON DATABASE albaranes TO lupierra;
+```
