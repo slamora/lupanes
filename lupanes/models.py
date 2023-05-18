@@ -29,6 +29,7 @@ class Producer(models.Model):
 class Product(models.Model):
     class Unit(models.TextChoices):
         BOTE = "bote"
+        BOTELLA = "botella"
         DOCENA = "docena"
         GARRAFA = "garrafa"
         KG = "Kg"
