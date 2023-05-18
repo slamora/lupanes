@@ -36,8 +36,8 @@
       <td>{{ note.amount|floatformat:2 }} €</td>
       <td>
         <div class="d-flex">
-          <a class="btn btn-outline-warning me-2" href="{% url 'lupanes:deliverynote-edit' note.pk %}">editar</a>
-          <a class="btn btn-outline-danger" href="{% url 'lupanes:deliverynote-delete' note.pk %}">eliminar</a>
+          <a class="btn btn-outline-warning me-2" href="{% url 'lupanes:deliverynote-edit' note.pk %}" title="editar"><i class="fa-solid fa-pencil"></i></a>
+          <a class="btn btn-outline-danger" href="{% url 'lupanes:deliverynote-delete' note.pk %}" title="eliminar"><i class="fa-solid fa-trash"></i></a>
         </div>
       </td>
     </tr>
