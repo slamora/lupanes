@@ -1,0 +1,36 @@
+{% extends "lupanes/base.html" %}
+{% load django_bootstrap5 %}
+
+{% block main %}
+<h1>Listado de albaranes</h1>
+
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>Fecha</th>
+      <th>Nevera</th>
+      <th>Producto</th>
+      <th>Cantidad</th>
+      <th>Importe</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for note in object_list %}
+    <tr>
+      <td>{{ forloop.counter }}</td>
+      <td>{{ note.date|date:"SHORT_DATE_FORMAT" }}</td>
+      <td>{{ note.customer.name }}</td>
+      <td>{{ note.product.name }}</td>
+      <td class="text-nowrap">
+        {% if note.product.unit_accept_decimals %}{{ note.quantity }}
+        {% else %}{{ note.quantity|floatformat:0 }}{% endif %}
+        {{ note.product.unit }}
+      </td>
+      <td>{{ note.amount|floatformat:2 }} €</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+{% endblock main %}

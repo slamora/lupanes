@@ -1,16 +1,17 @@
 from typing import Any, Dict
+from decimal import Decimal
 
 from django.db.models import QuerySet
 from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.urls import reverse_lazy
 from django.utils import timezone
-from django.views.generic import DetailView, RedirectView
+from django.views.generic import DetailView, ListView, RedirectView
 from django.views.generic.edit import (CreateView, DeleteView, FormView,
                                        UpdateView)
 
 from lupanes.forms import CustomerAuthForm, DeliveryNoteCreateForm
 from lupanes.mixins import CustomerAuthMixin
-from lupanes.models import DeliveryNote, Product
+from lupanes.models import Customer, DeliveryNote, Product
 
 
 class CustomerLoginView(FormView):
@@ -70,6 +71,39 @@ class DeliveryNoteDeleteView(CustomerAuthMixin, DeleteView):
     def get_queryset(self) -> QuerySet[Any]:
         today = timezone.now().date()
         return DeliveryNote.objects.filter(customer=self.customer, date__date=today)
+
+
+class DeliveryNoteListView(ListView):
+    model = DeliveryNote
+
+    def get_queryset(self) -> QuerySet[Any]:
+        self.month = timezone.now().date().month
+        return DeliveryNote.objects.filter(date__date__month=self.month)
+
+    def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        context["month"] = self.month
+        return context
+
+
+class DeliveryNoteSummaryView(ListView):
+    template_name = "lupanes/deliverynote_summary.html"
+
+    def get_queryset(self) -> QuerySet[Any]:
+        self.period = timezone.now().date()
+
+        qs = Customer.objects.filter(is_active=True)
+        for customer in qs:
+            customer.total = Decimal(0)
+            for note in customer.deliverynote_set.filter(date__date__month=self.period.month):
+                customer.total += note.amount()
+
+        return qs
+
+    def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        context["period"] = self.period
+        return context
 
 
 class ProductAjaxView(DetailView):

@@ -1,0 +1,26 @@
+{% extends "lupanes/base.html" %}
+{% load django_bootstrap5 %}
+
+{% block main %}
+<h1>Resumen de albaranes por neveras - {{ period|date:"F Y" }}</h1>
+
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>Nevera</th>
+      <th>Importe</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for customer in object_list %}
+    <tr>
+      <td>{{ forloop.counter }}</td>
+      <td>{{ customer.name }}</td>
+      <td>{{ customer.total|floatformat:2 }} €</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+{% endblock main %}
