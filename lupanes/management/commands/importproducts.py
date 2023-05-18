@@ -16,7 +16,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         debug = False   # TODO(@slamora): add_argument
-        drop = False   # TODO(@slamora): add_argument
+        drop = True | False   # TODO(@slamora): add_argument
 
         csv_reader = csv.DictReader(options["input_file"])
 
@@ -44,15 +44,12 @@ class Command(BaseCommand):
             item = Row(row)
             if item.product in products:
                 product = products[item.product]
-                ProductPrice.objects.create(value=item.price, start_date=item.date, product=product)
             else:
                 producer, _ = Producer.objects.get_or_create(name=item.producer)
-                product = Product.objects.create(name=item.product, unit=Product.Unit.UNIDAD, producer=producer)
-
+                product = Product.objects.create(name=item.product, unit=item.unit, producer=producer)
                 products[item.product] = product
-                ProductPrice.objects.create(value=item.price, start_date=item.date, product=product)
 
-            # TODO(@slamora) handle units
+            ProductPrice.objects.create(value=item.price, start_date=item.date, product=product)
 
 
 class Row:
@@ -64,6 +61,7 @@ class Row:
         self.product = self.clean_product()
         self.price = self.clean_price()
         self.producer = self.clean_producer()
+        self.unit = self.clean_unit()
 
     def clean_product(self):
         value = self.data['producto'].strip()
@@ -111,3 +109,7 @@ class Row:
     def clean_producer(self):
         value = self.data['productor']
         return value
+
+    def clean_unit(self):
+        value = self.data['unidad']
+        return Product.Unit(value.strip())
