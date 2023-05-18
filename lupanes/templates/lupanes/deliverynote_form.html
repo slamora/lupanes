@@ -29,26 +29,24 @@
       <td>{{ note.product.name }}</td>
       <td>{{ note.quantity }} {{ note.product.unit }}</td>
       <td>
-        <a class="btn btn-outline-warning" href="{% url 'lupanes:deliverynote-edit' note.pk %}">editar</a>
-        <a class="btn btn-outline-danger" href="{% url 'lupanes:deliverynote-delete' note.pk %}">eliminar</a>
+        <div class="d-flex">
+          <a class="btn btn-outline-warning me-2" href="{% url 'lupanes:deliverynote-edit' note.pk %}">editar</a>
+          <a class="btn btn-outline-danger" href="{% url 'lupanes:deliverynote-delete' note.pk %}">eliminar</a>
+        </div>
       </td>
     </tr>
     {% endfor %}
   </tbody>
 </table>
 
-<h2>Nuevo albarán</h2>
+<h2 class="mt-5">Nuevo albarán</h2>
 {% endif %}
 
 <form class="form" method="post">
   {% csrf_token %}
 
-  {% bootstrap_form form %}
-
-  <div class="mb-3">
-    <label class="form-label" for="id_unit">Unidad</label>
-    <input type="text" disabled class="form-control" id="id_unit">
-  </div>
+  {% bootstrap_field form.product %}
+  {% bootstrap_field form.quantity addon_after='<span class="text-secondary" id="id_unit"></span>'%}
 
   {% bootstrap_button button_type="submit" content="Enviar" %}
 </form>
@@ -66,9 +64,13 @@
         // TODO(@slamora): avoid hardcoded URL
         "/product/" + this.value + "/",
         function( data ) {
-          $("#id_unit").val(data["unit"]["name"]);
+          $("#id_unit").text(data["unit"]["name"]);
+
           let step = (data["unit"]["accept_decimals"] ? "0.001" : "1");
           $("#id_quantity").attr("step", step);
+
+          let min_value = (data["unit"]["accept_decimals"] ? "0.001" : "1");
+          $("#id_quantity").attr("min", min_value);
         },
       );
     });
