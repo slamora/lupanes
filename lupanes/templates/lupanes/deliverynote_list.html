@@ -4,7 +4,6 @@
 {% block main %}
 <h1>Listado de albaranes</h1>
 
-
 <ul class="list-inline">
   <li class="list-inline-item"><h2>{{ month.year }}</h2></li>
 {% for i, name in choices.items %}
@@ -17,6 +16,10 @@
   </li>
 {% endfor %}
 </ul>
+
+<div class="mb-3">
+  <a class="btn btn-outline-success" href="{% url 'lupanes:deliverynote-summary' %}?month={{ month.month }}">Ver resumen del mes por neveras</a>
+</div>
 
 <table class="table table-striped">
   <thead>

@@ -4,6 +4,12 @@
 {% block main %}
 <h1>Resumen de albaranes por neveras - {{ period|date:"F Y" }}</h1>
 
+<div class="mb-3">
+  <a class="btn btn-outline-success" href="{% url 'lupanes:deliverynote-list' %}?month={{ period.month }}">
+    <i class="fa-solid fa-arrow-left"></i> Volver al listado de albaranes
+  </a>
+</div>
+
 <table class="table table-striped">
   <thead>
     <tr>

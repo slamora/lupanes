@@ -1,5 +1,4 @@
 import calendar
-import datetime
 from decimal import Decimal
 from typing import Any, Dict
 
@@ -11,6 +10,7 @@ from django.views.generic import DetailView, ListView, RedirectView
 from django.views.generic.edit import (CreateView, DeleteView, FormView,
                                        UpdateView)
 
+from lupanes import helpers
 from lupanes.forms import CustomerAuthForm, DeliveryNoteCreateForm
 from lupanes.mixins import CustomerAuthMixin
 from lupanes.models import Customer, DeliveryNote, Product
@@ -79,22 +79,13 @@ class DeliveryNoteListView(ListView):
     model = DeliveryNote
 
     def get_queryset(self) -> QuerySet[Any]:
-        self.month = self.clean_month()
+        value = self.request.GET.get("month")
+        self.month = helpers.clean_month(value)
 
         return DeliveryNote.objects.filter(
             date__date__year=self.month.year,
             date__date__month=self.month.month,
         )
-
-    def clean_month(self):
-        today = timezone.now().date()
-        value = self.request.GET.get("month", today.month)
-        try:
-            value = datetime.date(year=today.year, month=int(value), day=1)
-        except ValueError:
-            value = today
-
-        return value
 
     def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
         context = super().get_context_data(**kwargs)
@@ -115,12 +106,17 @@ class DeliveryNoteSummaryView(ListView):
     template_name = "lupanes/deliverynote_summary.html"
 
     def get_queryset(self) -> QuerySet[Any]:
-        self.period = timezone.now().date()
+        value = self.request.GET.get("month")
+        self.period = helpers.clean_month(value)
 
         qs = Customer.objects.filter(is_active=True)
         for customer in qs:
             customer.total = Decimal(0)
-            for note in customer.deliverynote_set.filter(date__date__month=self.period.month):
+            notes = customer.deliverynote_set.filter(
+                date__date__year=self.period.year,
+                date__date__month=self.period.month,
+            )
+            for note in notes:
                 customer.total += note.amount()
 
         return qs
