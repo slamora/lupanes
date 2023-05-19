@@ -1,6 +1,14 @@
 {% extends "lupanes/base.html" %}
 {% load django_bootstrap5 %}
 
+{% block extra_style %}
+<style>
+  #deliverynote-summary .amount::after {
+    content: " €";
+  }
+</style>
+{% endblock %}
+
 {% block main %}
 <h1>Resumen de albaranes por neveras - {{ period|date:"F Y" }}</h1>
 
@@ -11,7 +19,8 @@
 </div>
 
 <div class="table-responsive">
-  <table class="table table-sm table-striped">
+  <table id="deliverynote-summary" class="table table-sm table-striped"
+    data-export-options='{"fileName": "albaranes-{{ period|date:"F Y" }}"}'>
     <thead>
       <tr>
         <th>#</th>
@@ -24,10 +33,24 @@
       <tr>
         <td>{{ forloop.counter }}</td>
         <td>{{ customer.name }}</td>
-        <td>{{ customer.total|floatformat:2 }} €</td>
+        <td class="amount">{{ customer.total|floatformat:2 }}</td>
       </tr>
       {% endfor %}
     </tbody>
   </table>
 </div>
 {% endblock main %}
+
+{% block extra_script %}
+<script>
+  $(document).ready(function () {
+    $('#deliverynote-summary').DataTable({
+      dom: 'Bfrtip',
+      buttons: [
+        'copy', 'csv', 'excel', 'pdf', 'print'
+      ],
+      paging: false,
+    });
+  });
+</script>
+{% endblock %}
