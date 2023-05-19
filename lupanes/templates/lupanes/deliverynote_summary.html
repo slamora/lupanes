@@ -10,23 +10,24 @@
   </a>
 </div>
 
-<table class="table table-striped">
-  <thead>
-    <tr>
-      <th>#</th>
-      <th>Nevera</th>
-      <th>Importe</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for customer in object_list %}
-    <tr>
-      <td>{{ forloop.counter }}</td>
-      <td>{{ customer.name }}</td>
-      <td>{{ customer.total|floatformat:2 }} €</td>
-    </tr>
-    {% endfor %}
-  </tbody>
-</table>
-
+<div class="table-responsive">
+  <table class="table table-sm table-striped">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Nevera</th>
+        <th>Importe</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for customer in object_list %}
+      <tr>
+        <td>{{ forloop.counter }}</td>
+        <td>{{ customer.name }}</td>
+        <td>{{ customer.total|floatformat:2 }} €</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
 {% endblock main %}

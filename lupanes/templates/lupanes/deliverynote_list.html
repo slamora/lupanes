@@ -5,49 +5,53 @@
 <h1>Listado de albaranes</h1>
 
 <ul class="list-inline">
-  <li class="list-inline-item"><h2>{{ month.year }}</h2></li>
-{% for i, name in choices.items %}
+  <li class="list-inline-item">
+    <h2>{{ month.year }}</h2>
+  </li>
+  {% for i, name in choices.items %}
   <li class="list-inline-item">
     {% if i == month.month %}
-      <strong>{{ name }}</strong>
+    <strong>{{ name }}</strong>
     {% else %}
-      <a href="{% url 'lupanes:deliverynote-list' %}?month={{ i }}">{{ name }}</a>
+    <a href="{% url 'lupanes:deliverynote-list' %}?month={{ i }}">{{ name }}</a>
     {% endif %}
   </li>
-{% endfor %}
+  {% endfor %}
 </ul>
 
 <div class="mb-3">
-  <a class="btn btn-outline-success" href="{% url 'lupanes:deliverynote-summary' %}?month={{ month.month }}">Ver resumen del mes por neveras</a>
+  <a class="btn btn-outline-success" href="{% url 'lupanes:deliverynote-summary' %}?month={{ month.month }}">Ver resumen
+    del mes por neveras</a>
 </div>
 
-<table class="table table-striped">
-  <thead>
-    <tr>
-      <th>#</th>
-      <th>Fecha</th>
-      <th>Nevera</th>
-      <th>Producto</th>
-      <th>Cantidad</th>
-      <th>Importe</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for note in object_list %}
-    <tr>
-      <td>{{ forloop.counter }}</td>
-      <td>{{ note.date|date:"SHORT_DATE_FORMAT" }}</td>
-      <td>{{ note.customer.name }}</td>
-      <td>{{ note.product.name }}</td>
-      <td class="text-nowrap">
-        {% if note.product.unit_accept_decimals %}{{ note.quantity }}
-        {% else %}{{ note.quantity|floatformat:0 }}{% endif %}
-        {{ note.product.unit }}
-      </td>
-      <td>{{ note.amount|floatformat:2 }} €</td>
-    </tr>
-    {% endfor %}
-  </tbody>
-</table>
-
+<div class="table-responsive">
+  <table class="table table-sm table-striped">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Fecha</th>
+        <th>Nevera</th>
+        <th>Producto</th>
+        <th>Cantidad</th>
+        <th>Importe</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for note in object_list %}
+      <tr>
+        <td>{{ forloop.counter }}</td>
+        <td>{{ note.date|date:"SHORT_DATE_FORMAT" }}</td>
+        <td>{{ note.customer.name }}</td>
+        <td>{{ note.product.name }}</td>
+        <td class="text-nowrap">
+          {% if note.product.unit_accept_decimals %}{{ note.quantity }}
+          {% else %}{{ note.quantity|floatformat:0 }}{% endif %}
+          {{ note.product.unit }}
+        </td>
+        <td>{{ note.amount|floatformat:2 }} €</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
 {% endblock main %}
