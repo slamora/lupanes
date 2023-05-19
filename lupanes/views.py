@@ -1,5 +1,7 @@
-from typing import Any, Dict
+import calendar
+import datetime
 from decimal import Decimal
+from typing import Any, Dict
 
 from django.db.models import QuerySet
 from django.http import HttpRequest, HttpResponse, JsonResponse
@@ -77,12 +79,35 @@ class DeliveryNoteListView(ListView):
     model = DeliveryNote
 
     def get_queryset(self) -> QuerySet[Any]:
-        self.month = timezone.now().date().month
-        return DeliveryNote.objects.filter(date__date__month=self.month)
+        self.month = self.clean_month()
+
+        return DeliveryNote.objects.filter(
+            date__date__year=self.month.year,
+            date__date__month=self.month.month,
+        )
+
+    def clean_month(self):
+        today = timezone.now().date()
+        value = self.request.GET.get("month", today.month)
+        try:
+            value = datetime.date(year=today.year, month=int(value), day=1)
+        except ValueError:
+            value = today
+
+        return value
 
     def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
         context = super().get_context_data(**kwargs)
-        context["month"] = self.month
+        today = timezone.now().date()
+        choices = {
+            i: calendar.month_name[i]
+            for i in range(1, today.month + 1)
+        }
+
+        context.update({
+            "month": self.month,
+            "choices": choices,
+        })
         return context
 
 

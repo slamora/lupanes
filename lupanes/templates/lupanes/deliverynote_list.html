@@ -4,6 +4,20 @@
 {% block main %}
 <h1>Listado de albaranes</h1>
 
+
+<ul class="list-inline">
+  <li class="list-inline-item"><h2>{{ month.year }}</h2></li>
+{% for i, name in choices.items %}
+  <li class="list-inline-item">
+    {% if i == month.month %}
+      <strong>{{ name }}</strong>
+    {% else %}
+      <a href="{% url 'lupanes:deliverynote-list' %}?month={{ i }}">{{ name }}</a>
+    {% endif %}
+  </li>
+{% endfor %}
+</ul>
+
 <table class="table table-striped">
   <thead>
     <tr>
