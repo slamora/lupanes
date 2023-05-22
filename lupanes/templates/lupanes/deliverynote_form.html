@@ -3,16 +3,11 @@
 
 {% block main %}
 {% if object %}
-<h2>Editar albarán</h2>
+<h1>Editar albarán</h1>
 
 {% else %}
-<div class="d-flex justify-content-between">
-  <h1>La compra de hoy</h1>
-  <div>
-    <h4 class="badge bg-success">{{ form.customer.name }}</h4>
-    <a class="btn btn-link" href="{% url 'lupanes:customer-logout' %}">salir</a>
-  </div>
-</div>
+<h1>La compra de hoy</h1>
+
 <table class="table table-striped">
   <thead>
     <tr>
