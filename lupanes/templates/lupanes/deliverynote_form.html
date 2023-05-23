@@ -1,6 +1,18 @@
 {% extends "lupanes/base.html" %}
 {% load django_bootstrap5 %}
 
+{% block extra_style %}
+<style>
+  #id_price::before {
+    content: "Precio: ";
+  }
+
+  #id_price::after {
+    content: " €";
+  }
+</style>
+{% endblock %}
+
 {% block main %}
 {% if object %}
 <h1>Editar albarán</h1>
@@ -38,14 +50,15 @@
     </tr>
     {% empty %}
     <tr>
-    <td colspan="5">Todavía no has comprado nada hoy. <a href="#new-deliverynote">Crear nuevo albarán</a></td>
+      <td colspan="5">Todavía no has comprado nada hoy. <a href="#new-deliverynote">Crear nuevo albarán</a></td>
     </tr>
     {% endfor %}
   </tbody>
 </table>
 <div class="alert alert-primary" role="alert">
   <strong>NOTA:</strong>
-  Los precios son orientativos (puede ser que en el momento de registrar el albarán todavía esté pendiente de actualizarse el último precio del producto).
+  Los precios son orientativos (puede ser que en el momento de registrar el albarán todavía esté pendiente de
+  actualizarse el último precio del producto).
 </div>
 
 <h2 id="new-deliverynote" class="mt-5">Nuevo albarán</h2>
@@ -56,6 +69,9 @@
     {% csrf_token %}
 
     {% bootstrap_field form.product %}
+
+    <div id="id_price" class="mb-2">-</div>
+
     {% bootstrap_field form.quantity addon_after='<span class="text-secondary" id="id_unit"></span>'%}
 
     {% bootstrap_button button_type="submit" content="Enviar" %}
@@ -69,12 +85,16 @@
   $(document).ready(function () {
     $('#id_product').select2();
 
-    $("#id_product").on("change", function() {
+    $("#id_product").on("change", function () {
+      if (!this.value) {
+        return;
+      }
       $.getJSON(
         // TODO(@slamora): avoid hardcoded URL
         "/product/" + this.value + "/",
-        function( data ) {
+        function (data) {
           $("#id_unit").text(data["unit"]["name"]);
+          $("#id_price").text(data["price"]);
 
           let step = (data["unit"]["accept_decimals"] ? "0.001" : "1");
           $("#id_quantity").attr("step", step);

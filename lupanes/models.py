@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils import timezone
 
 
 class Customer(models.Model):
@@ -58,7 +59,9 @@ class Product(models.Model):
     def unit_accept_decimals(self):
         return self.unit in Product.Unit.fractional_units()
 
-    def get_price_on(self, date):
+    def get_price_on(self, date=None):
+        if date is None:
+            date = timezone.now()
         pprice = self.productprice_set.filter(start_date__lte=date).latest("start_date")
         return pprice.value
 

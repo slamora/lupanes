@@ -135,6 +135,7 @@ class ProductAjaxView(DetailView):
         data = {
             "pk": obj.pk,
             "name": obj.name,
+            "price": obj.get_price_on(),
             "unit": {
                 "name": obj.unit,
                 "accept_decimals": obj.unit_accept_decimals(),
