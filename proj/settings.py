@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'django_bootstrap5',
     'django_extensions',
     'lupanes',
+    'lupanes.users',
 ]
 
 MIDDLEWARE = [
@@ -159,3 +160,10 @@ EMAIL_USE_TLS = env('EMAIL_USE_TLS', default=False, cast=bool)
 EMAIL_USE_SSL = env('EMAIL_USE_SSL', default=False, cast=bool)
 
 EMAIL_TIMEOUT = 5
+
+# Authentication
+LOGIN_URL = 'users:login'
+
+LOGIN_REDIRECT_URL = 'lupanes:deliverynote-list'
+
+LOGOUT_REDIRECT_URL = LOGIN_URL

@@ -2,6 +2,7 @@ import calendar
 from decimal import Decimal
 from typing import Any, Dict
 
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import QuerySet
 from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.urls import reverse_lazy
@@ -75,7 +76,7 @@ class DeliveryNoteDeleteView(CustomerAuthMixin, DeleteView):
         return DeliveryNote.objects.filter(customer=self.customer, date__date=today)
 
 
-class DeliveryNoteListView(ListView):
+class DeliveryNoteListView(LoginRequiredMixin, ListView):
     model = DeliveryNote
 
     def get_queryset(self) -> QuerySet[Any]:
@@ -102,7 +103,7 @@ class DeliveryNoteListView(ListView):
         return context
 
 
-class DeliveryNoteSummaryView(ListView):
+class DeliveryNoteSummaryView(LoginRequiredMixin, ListView):
     template_name = "lupanes/deliverynote_summary.html"
 
     def get_queryset(self) -> QuerySet[Any]:

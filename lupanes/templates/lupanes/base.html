@@ -20,6 +20,7 @@
   {% block extra_style %}{% endblock %}
 </head>
 
+{% block body %}
 <body class="{{ request.resolver_match.url_name }}">
   {% block header %}
   <header>
@@ -128,5 +129,5 @@
     integrity="sha256-9yRP/2EFlblE92vzCA10469Ctd0jT48HnmmMw5rJZrA=" crossorigin="anonymous"></script>
   {% block extra_script %}{% endblock %}
 </body>
-
+{% endblock %}
 </html>

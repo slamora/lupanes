@@ -1,0 +1,22 @@
+{% extends "lupanes/base.html" %}
+{% load static i18n %}
+{% block body %}
+<body class="container">
+  <div class="container-fluid" style="margin-top: 30px;">
+    <div class="row-fluid">
+      <div class="well rounded" style="width: 320px; margin-left: auto; margin-right: auto; background: rgba(169, 169, 169, 0.25); padding: 1em;">
+        <div class="row-fluid">
+          <div>
+            {% block branding %}<h3 style="margin: 0 0 20px;">Lupierra</h3>{% endblock %}
+          </div>
+        </div><!-- /row fluid -->
+
+        <div class="row-fluid">
+          {% block login_content %}
+          {% endblock login_content %}
+        </div><!-- /.row-fluid -->
+      </div><!--/.well-->
+    </div><!-- /.row-fluid -->
+  </div><!-- /.container-fluid -->
+</body>
+{% endblock %}
