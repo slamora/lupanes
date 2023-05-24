@@ -44,6 +44,15 @@ class ProductPriceForm(forms.ModelForm):
         self.product = kwargs.pop("product")
         return super().__init__(*args, **kwargs)
 
+    def clean(self):
+        cleaned_data = super().clean()
+
+        start_date = cleaned_data.get("start_date")
+        if self.product.productprice_set.filter(start_date=start_date).exists():
+            self.add_error("start_date", ValidationError("Ya existe precio para esa fecha", code="invalid"))
+
+        return cleaned_data
+
     def save(self, commit=True):
         self.instance.product = self.product
         instance = super().save(commit)

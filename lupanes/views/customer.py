@@ -1,8 +1,11 @@
 from typing import Any, Dict
 
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib import messages
 from django.db.models import QuerySet
-from django.http import HttpRequest, HttpResponse, JsonResponse
+from django.forms.models import BaseModelForm
+from django.http import (HttpRequest, HttpResponse, HttpResponseRedirect,
+                         JsonResponse)
 from django.shortcuts import get_object_or_404
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
@@ -116,6 +119,11 @@ class ProductNewPriceView(LoginRequiredMixin, CreateView):
         kwargs = super().get_form_kwargs()
         kwargs["product"] = get_object_or_404(Product, pk=self.kwargs["pk"])
         return kwargs
+
+    def form_invalid(self, form: BaseModelForm) -> HttpResponse:
+        # TODO(@slamora): return `ProductUpdateView.form_invalid` response
+        messages.error(self.request, form.errors)
+        return HttpResponseRedirect(redirect_to=self.get_success_url())
 
     def get_success_url(self) -> str:
         return reverse("lupanes:product-edit", args=(self.kwargs["pk"],))
