@@ -74,7 +74,8 @@ class ProductPrice(models.Model):
     start_date = models.DateField()
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
 
+    class Meta:
+        unique_together = ["product", "start_date"]
+
     def __str__(self) -> str:
         return f"{self.product.name} - {self.value} ({self.start_date})"
-
-    # TODO (unique together start_date & product)
