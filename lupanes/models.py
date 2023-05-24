@@ -18,6 +18,9 @@ class DeliveryNote(models.Model):
     product = models.ForeignKey("Product", on_delete=models.PROTECT)
     quantity = models.DecimalField("Cantidad", max_digits=6, decimal_places=3)
 
+    def amount(self):
+        return self.quantity * self.product.get_price_on(self.date)
+
 
 class Producer(models.Model):
     name = models.CharField(max_length=255, unique=True)
@@ -29,6 +32,7 @@ class Producer(models.Model):
 class Product(models.Model):
     class Unit(models.TextChoices):
         BOTE = "bote"
+        BOTELLA = "botella"
         DOCENA = "docena"
         GARRAFA = "garrafa"
         KG = "Kg"
@@ -54,6 +58,10 @@ class Product(models.Model):
     def unit_accept_decimals(self):
         return self.unit in Product.Unit.fractional_units()
 
+    def get_price_on(self, date):
+        pprice = self.productprice_set.filter(start_date__lte=date).latest("start_date")
+        return pprice.value
+
 
 class ProductPrice(models.Model):
     value = models.DecimalField(max_digits=5, decimal_places=2)
@@ -62,3 +70,5 @@ class ProductPrice(models.Model):
 
     def __str__(self) -> str:
         return f"{self.product.name} - {self.value} ({self.start_date})"
+
+    # TODO (unique together start_date & product)
