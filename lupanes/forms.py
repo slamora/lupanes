@@ -1,7 +1,7 @@
 from django import forms
 from django.core.exceptions import ValidationError
 
-from lupanes.models import Customer, DeliveryNote
+from lupanes.models import Customer, DeliveryNote, ProductPrice
 
 
 class CustomerAuthForm(forms.Form):
@@ -29,5 +29,22 @@ class DeliveryNoteCreateForm(forms.ModelForm):
 
     def save(self, commit=True):
         self.instance.customer = self.customer
+        instance = super().save(commit)
+        return instance
+
+
+class ProductPriceForm(forms.ModelForm):
+    start_date = forms.DateField(widget=forms.SelectDateWidget())
+
+    class Meta:
+        model = ProductPrice
+        fields = ["start_date", "value"]
+
+    def __init__(self, *args, **kwargs):
+        self.product = kwargs.pop("product")
+        return super().__init__(*args, **kwargs)
+
+    def save(self, commit=True):
+        self.instance.product = self.product
         instance = super().save(commit)
         return instance

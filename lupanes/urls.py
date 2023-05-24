@@ -16,4 +16,6 @@ urlpatterns = [
 
     path('product/<int:pk>/', views.ProductAjaxView.as_view(), name='product-detail'),
     path('products/', views.ProductListView.as_view(), name='product-list'),
+    path('products/<int:pk>/edit/', views.ProductUpdateView.as_view(), name='product-edit'),
+    path('products/<int:pk>/new-price/', views.ProductNewPriceView.as_view(), name='product-new-price'),
 ]

@@ -15,21 +15,33 @@
         <th>Precio (actual)</th>
         {% if not request.user.is_anonymous %}
         <th>¿Activo?</th>
+        <th><!-- actions --></th>
         {% endif %}
       </tr>
     </thead>
     <tbody>
       {% for product in object_list %}
+      <!-- hidde inactive products to customers -->
+      {% if product.is_active or not request.user.is_anonymous %}
       <tr>
         <td>{{ forloop.counter }}</td>
-        <td>{{ product.name }}</td>
+        <td>
+          {% if request.user.is_anonymous %}
+          {{ product.name }}
+          {% else %}
+            <a href="{% url 'lupanes:product-edit' product.pk %}" title="editar">
+              {{ product.name }}</a>
+          {% endif %}
+        </td>
         <td>{{ product.producer }}</td>
         <td>{{ product.get_unit_display }}</td>
         <td>{{ product.get_current_price }} €</td>
         {% if not request.user.is_anonymous %}
         <td>{{ product.is_active|yesno:"Sí,No"}}</td>
+        <td>...</td>
         {% endif %}
       </tr>
+      {% endif %}
       {% endfor %}
     </tbody>
   </table>

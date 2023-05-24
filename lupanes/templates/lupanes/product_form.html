@@ -1,0 +1,37 @@
+{% extends "lupanes/base.html" %}
+{% load django_bootstrap5 %}
+
+{% block main %}
+<h1>{{ product.name }}</h1>
+
+<div class="bg-light p-4 rounded-2 border border-secondary mb-4">
+  <form class="form" method="post">
+    {% csrf_token %}
+
+    {% bootstrap_form form %}
+
+    {% bootstrap_button button_type="submit" content="Actualizar" %}
+  </form>
+</div>
+
+<div class="bg-light p-4 rounded-2 border border-warning">
+  <h2>Histórico de precios</h2>
+  <ul>
+  {% for pprice in product.productprice_set.all %}
+    <li>{{ pprice.start_date|date:"SHORT_DATE_FORMAT" }}: {{ pprice.value }} €</li>
+  {% endfor %}
+  </ul>
+
+  <h3>Nuevo precio</h3>
+  <form class="form" action="{% url 'lupanes:product-new-price' product.pk %}" method="post">
+    {% csrf_token %}
+
+    {% bootstrap_field form_pprice.start_date %}
+
+    {% bootstrap_field form_pprice.value addon_after='<span class="text-secondary">€</span>'%}
+
+    {% bootstrap_button button_type="submit" content="Nuevo precio" %}
+  </form>
+
+</div>
+{% endblock %}
