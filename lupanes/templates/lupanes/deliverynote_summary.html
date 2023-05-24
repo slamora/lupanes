@@ -1,0 +1,56 @@
+{% extends "lupanes/base.html" %}
+{% load django_bootstrap5 %}
+
+{% block extra_style %}
+<style>
+  #deliverynote-summary .amount::after {
+    content: " €";
+  }
+</style>
+{% endblock %}
+
+{% block main %}
+<h1>Resumen de albaranes por neveras - {{ period|date:"F Y" }}</h1>
+
+<div class="mb-3">
+  <a class="btn btn-outline-success" href="{% url 'lupanes:deliverynote-list' %}?month={{ period.month }}">
+    <i class="fa-solid fa-arrow-left"></i> Volver al listado de albaranes
+  </a>
+</div>
+
+<div class="table-responsive">
+  <table id="deliverynote-summary" class="table table-sm table-striped"
+    data-export-options='{"fileName": "albaranes-{{ period|date:"F Y" }}"}'>
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Nevera</th>
+        <th>Importe</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for customer in object_list %}
+      <tr>
+        <td>{{ forloop.counter }}</td>
+        <td>{{ customer.name }}</td>
+        <td class="amount">{{ customer.total|floatformat:2 }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock main %}
+
+{% block extra_script %}
+<script>
+  $(document).ready(function () {
+    $('#deliverynote-summary').DataTable({
+      dom: 'Bfrtip',
+      buttons: [
+        'copy', 'csv', 'excel', 'pdf', 'print'
+      ],
+      paging: false,
+    });
+  });
+</script>
+{% endblock %}

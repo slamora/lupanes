@@ -19,5 +19,6 @@ from django.views.generic import RedirectView
 
 urlpatterns = [
     path('', include('lupanes.urls')),
+    path('', include('lupanes.users.urls')),
     path('', RedirectView.as_view(pattern_name='lupanes:customer-login', permanent=True), name='root_index'),
 ]

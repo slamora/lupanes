@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Dict
 
 from django.core.exceptions import PermissionDenied
 from django.http import HttpRequest, HttpResponse
@@ -14,3 +14,8 @@ class CustomerAuthMixin:
         except Customer.DoesNotExist:
             raise PermissionDenied()
         return super().dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        context["customer"] = self.customer
+        return context
