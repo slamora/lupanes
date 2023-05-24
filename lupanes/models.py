@@ -59,6 +59,9 @@ class Product(models.Model):
     def unit_accept_decimals(self):
         return self.unit in Product.Unit.fractional_units()
 
+    def get_current_price(self):
+        return self.get_price_on(timezone.now())
+
     def get_price_on(self, date=None):
         if date is None:
             date = timezone.now()

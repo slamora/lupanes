@@ -4,7 +4,7 @@ from django.db.models import QuerySet
 from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.urls import reverse_lazy
 from django.utils import timezone
-from django.views.generic import DetailView, RedirectView
+from django.views.generic import DetailView, ListView, RedirectView
 from django.views.generic.edit import (CreateView, DeleteView, FormView,
                                        UpdateView)
 
@@ -73,7 +73,7 @@ class DeliveryNoteDeleteView(CustomerAuthMixin, DeleteView):
         return DeliveryNote.objects.filter(customer=self.customer, date__date=today)
 
 
-class ProductAjaxView(DetailView):
+class ProductAjaxView(CustomerAuthMixin, DetailView):
     model = Product
 
     def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> JsonResponse:
@@ -88,3 +88,7 @@ class ProductAjaxView(DetailView):
             }
         }
         return JsonResponse(data=data)
+
+
+class ProductListView(CustomerAuthMixin, ListView):
+    model = Product

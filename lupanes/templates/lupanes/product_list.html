@@ -1,0 +1,38 @@
+{% extends "lupanes/base.html" %}
+{% load django_bootstrap5 %}
+
+{% block main %}
+<h1>Listado de productos</h1>
+
+<div class="table-responsive">
+  <table class="table table-sm table-striped">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Nombre</th>
+        <th>Productor</th>
+        <th>Unidad</th>
+        <th>Precio (actual)</th>
+        {% if not request.user.is_anonymous %}
+        <th>¿Activo?</th>
+        {% endif %}
+      </tr>
+    </thead>
+    <tbody>
+      {% for product in object_list %}
+      <tr>
+        <td>{{ forloop.counter }}</td>
+        <td>{{ product.name }}</td>
+        <td>{{ product.producer }}</td>
+        <td>{{ product.get_unit_display }}</td>
+        <td>{{ product.get_current_price }} €</td>
+        {% if not request.user.is_anonymous %}
+        <td>{{ product.is_active|yesno:"Sí,No"}}</td>
+        {% endif %}
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% endblock %}

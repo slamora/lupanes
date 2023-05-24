@@ -1,8 +1,12 @@
-from lupanes.views.customer import (CustomerLoginView, CustomerLogoutView,
-                                    DeliveryNoteCreateView,
-                                    DeliveryNoteDeleteView,
-                                    DeliveryNoteUpdateView)
-
+from lupanes.views.customer import (
+    CustomerLoginView,
+    CustomerLogoutView,
+    DeliveryNoteCreateView,
+    DeliveryNoteDeleteView,
+    DeliveryNoteUpdateView,
+    ProductAjaxView,
+    ProductListView,
+)
 from lupanes.views.manager import DeliveryNoteListView, DeliveryNoteSummaryView
 
 __all__ = [
@@ -13,4 +17,6 @@ __all__ = [
     "DeliveryNoteUpdateView",
     "DeliveryNoteListView",
     "DeliveryNoteSummaryView",
+    "ProductAjaxView",
+    "ProductListView",
 ]

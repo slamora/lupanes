@@ -40,18 +40,21 @@
         </button>
 
         <div class="collapse navbar-collapse" id="navbarsExample04">
+          {% with request.resolver_match.url_name as url_name %}
           <ul class="navbar-nav me-auto mb-2 mb-md-0">
             <li class="nav-item">
-              <a class="nav-link active" aria-current="page" href="{% url 'lupanes:deliverynote-new' %}">Nuevo
-                albarán</a>
+              <a class="nav-link {% if url_name == 'deliverynote-new' %}active" aria-current="page"{% else %}" {% endif %}
+                href="{% url 'lupanes:deliverynote-new' %}">Nuevo albarán</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link disabled">Listado de precios</a>
+              <a class="nav-link {% if url_name == 'product-list' %}active" aria-current="page"{% else %}"  {% endif %}
+                href="{% url 'lupanes:product-list' %}">Lista de precios</a>
             </li>
             <li class="nav-item">
               <a class="nav-link disabled">Ayuda</a>
             </li>
           </ul>
+          {% endwith %}
 
           <hr class="d-lg-none text-white-50">
 
