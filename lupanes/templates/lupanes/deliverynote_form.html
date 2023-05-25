@@ -20,6 +20,8 @@
 {% else %}
 <h1>La compra de hoy</h1>
 
+<p>Hola, <span class="text-success">{{ customer.name }}</span>. ¿No eres tú? <a href="{% url 'lupanes:customer-logout' %}">Pulsa para cambiar de nevera</a>.</p>
+
 <table class="table table-striped">
   <thead>
     <tr>
