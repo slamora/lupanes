@@ -50,3 +50,11 @@ CREATE DATABASE albaranes;
 CREATE USER lupierra WITH PASSWORD 'VerYs3cretP4$$';
 GRANT ALL PRIVILEGES ON DATABASE albaranes TO lupierra;
 ```
+
+## Configure email (async via django-post-office)
+Schedule management command to send emails regularly via cron:
+
+```sh
+* * * * * (/usr/bin/python manage.py send_queued_mail >> send_mail.log 2>&1)
+```
+More configuration options on [django-post-office](https://github.com/ui/django-post_office).
