@@ -10,10 +10,10 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
+import datetime
 from pathlib import Path
 
 import environ
-
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django_bootstrap5',
     'django_extensions',
+    'post_office',
     'lupanes',
     'lupanes.users',
 ]
@@ -147,6 +148,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Email configuration
 DEFAULT_FROM_EMAIL = env('DEFAULT_FROM_EMAIL', default='webmaster@localhost')
 
+EMAIL_BACKEND = 'post_office.EmailBackend'
+
 EMAIL_HOST = env('EMAIL_HOST', default='localhost')
 
 EMAIL_HOST_USER = env('EMAIL_HOST_USER', default='')
@@ -160,6 +163,11 @@ EMAIL_USE_TLS = env('EMAIL_USE_TLS', default=False, cast=bool)
 EMAIL_USE_SSL = env('EMAIL_USE_SSL', default=False, cast=bool)
 
 EMAIL_TIMEOUT = 5
+
+POST_OFFICE = {
+    'MAX_RETRIES': 4,
+    'RETRY_INTERVAL': datetime.timedelta(minutes=2),
+}
 
 # Authentication
 LOGIN_URL = 'users:login'
