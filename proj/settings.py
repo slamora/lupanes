@@ -172,6 +172,6 @@ POST_OFFICE = {
 # Authentication
 LOGIN_URL = 'users:login'
 
-LOGIN_REDIRECT_URL = 'lupanes:deliverynote-list'
+LOGIN_REDIRECT_URL = 'lupanes:product-list'
 
 LOGOUT_REDIRECT_URL = LOGIN_URL
