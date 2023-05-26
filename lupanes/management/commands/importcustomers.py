@@ -19,7 +19,8 @@ class Command(BaseCommand):
         csv_reader = csv.DictReader(options["input_file"])
         for row in csv_reader:
             username = row['Nombre nevera'].strip()
-            user = User.objects.create(username=username)
+            email = row['E-mail'].strip()
+            user = User.objects.create(username=username, email=email)
             customers.append(user)
 
         customers_group, _ = Group.objects.get_or_create(name=CUSTOMERS_GROUP)
