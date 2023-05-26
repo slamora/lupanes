@@ -2,13 +2,16 @@ import calendar
 from decimal import Decimal
 from typing import Any, Dict
 
+from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import QuerySet
 from django.utils import timezone
 from django.views.generic import ListView
 
 from lupanes import helpers
-from lupanes.models import Customer, DeliveryNote
+from lupanes.models import DeliveryNote
+
+User = get_user_model()
 
 
 class DeliveryNoteListView(LoginRequiredMixin, ListView):
@@ -45,7 +48,7 @@ class DeliveryNoteSummaryView(LoginRequiredMixin, ListView):
         value = self.request.GET.get("month")
         self.period = helpers.clean_month(value)
 
-        qs = Customer.objects.filter(is_active=True)
+        qs = User.objects.filter(is_active=True)
         for customer in qs:
             customer.total = Decimal(0)
             notes = customer.deliverynote_set.filter(

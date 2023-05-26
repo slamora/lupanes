@@ -5,9 +5,6 @@ from lupanes import views
 app_name = "lupanes"
 
 urlpatterns = [
-    path('customer/login/', views.CustomerLoginView.as_view(), name='customer-login'),
-    path('customer/logout/', views.CustomerLogoutView.as_view(), name='customer-logout'),
-
     path('albaran/', views.DeliveryNoteListView.as_view(), name='deliverynote-list'),
     path('albaran/summary/', views.DeliveryNoteSummaryView.as_view(), name='deliverynote-summary'),
     path('albaran/new/', views.DeliveryNoteCreateView.as_view(), name='deliverynote-new'),
