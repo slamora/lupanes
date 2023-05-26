@@ -1,20 +1,13 @@
+from django.contrib.auth import get_user_model
 from django.db import models
 from django.utils import timezone
 
-
-class Customer(models.Model):
-    """Nevera"""
-    name = models.CharField(max_length=255, unique=True)
-    email = models.EmailField()
-    is_active = models.BooleanField(default=True)
-
-    def __str__(self) -> str:
-        return f"{self.name} ({self.email})"
+User = get_user_model()
 
 
 class DeliveryNote(models.Model):
     """Albarán"""
-    customer = models.ForeignKey("Customer", on_delete=models.PROTECT)
+    customer = models.ForeignKey(User, on_delete=models.PROTECT)
     date = models.DateTimeField(auto_now_add=True)
     product = models.ForeignKey("Product", on_delete=models.PROTECT)
     quantity = models.DecimalField("Cantidad", max_digits=6, decimal_places=3)
@@ -59,6 +52,9 @@ class Product(models.Model):
     def unit_accept_decimals(self):
         return self.unit in Product.Unit.fractional_units()
 
+    def get_current_price(self):
+        return self.get_price_on(timezone.now())
+
     def get_price_on(self, date=None):
         if date is None:
             date = timezone.now()
@@ -71,7 +67,8 @@ class ProductPrice(models.Model):
     start_date = models.DateField()
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
 
+    class Meta:
+        unique_together = ["product", "start_date"]
+
     def __str__(self) -> str:
         return f"{self.product.name} - {self.value} ({self.start_date})"
-
-    # TODO (unique together start_date & product)

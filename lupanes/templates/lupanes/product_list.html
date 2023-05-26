@@ -1,0 +1,50 @@
+{% extends "lupanes/base.html" %}
+{% load django_bootstrap5 %}
+
+{% block main %}
+<h1>Listado de productos</h1>
+
+<div class="table-responsive">
+  <table class="table table-sm table-striped">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Nombre</th>
+        <th>Productor</th>
+        <th>Unidad</th>
+        <th>Precio (actual)</th>
+        {% if request.user.is_manager %}
+        <th>¿Activo?</th>
+        <th><!-- actions --></th>
+        {% endif %}
+      </tr>
+    </thead>
+    <tbody>
+      {% for product in object_list %}
+      <!-- hidde inactive products to customers -->
+      {% if product.is_active or request.user.is_manager %}
+      <tr>
+        <td>{{ forloop.counter }}</td>
+        <td>
+          {% if request.user.is_manager %}
+            <a href="{% url 'lupanes:product-edit' product.pk %}" title="editar">
+              {{ product.name }}</a>
+          {% else %}
+            {{ product.name }}
+          {% endif %}
+        </td>
+        <td>{{ product.producer }}</td>
+        <td>{{ product.get_unit_display }}</td>
+        <td>{{ product.get_current_price }} €</td>
+        {% if request.user.is_manager %}
+        <td>{{ product.is_active|yesno:"Sí,No"}}</td>
+        <td>...</td>
+        {% endif %}
+      </tr>
+      {% endif %}
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% endblock %}

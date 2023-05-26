@@ -41,7 +41,7 @@
       <tr>
         <td>{{ forloop.counter }}</td>
         <td>{{ note.date|date:"SHORT_DATE_FORMAT" }}</td>
-        <td>{{ note.customer.name }}</td>
+        <td>{{ note.customer.username }}</td>
         <td>{{ note.product.name }}</td>
         <td class="text-nowrap">
           {% if note.product.unit_accept_decimals %}{{ note.quantity }}
