@@ -1,7 +1,8 @@
 from typing import Any, Dict
 
-from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
+from django.contrib.auth import get_user_model
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import QuerySet
 from django.forms.models import BaseModelForm
 from django.http import (HttpRequest, HttpResponse, HttpResponseRedirect,
@@ -9,35 +10,14 @@ from django.http import (HttpRequest, HttpResponse, HttpResponseRedirect,
 from django.shortcuts import get_object_or_404
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
-from django.views.generic import DetailView, ListView, RedirectView
-from django.views.generic.edit import (CreateView, DeleteView, FormView,
-                                       UpdateView)
+from django.views.generic import DetailView, ListView
+from django.views.generic.edit import CreateView, DeleteView, UpdateView
 
-from lupanes.forms import (CustomerAuthForm, DeliveryNoteCreateForm,
-                           ProductPriceForm)
-from lupanes.mixins import CustomerAuthMixin
+from lupanes.forms import DeliveryNoteCreateForm, ProductPriceForm
 from lupanes.models import DeliveryNote, Product
+from lupanes.users.mixins import CustomerAuthMixin
 
-
-class CustomerLoginView(FormView):
-    form_class = CustomerAuthForm
-    template_name = "lupanes/customer_login.html"
-    success_url = reverse_lazy("lupanes:deliverynote-new")
-
-    def form_valid(self, form: Any) -> HttpResponse:
-        self.request.session["customer_id"] = form.customer_id
-        return super().form_valid(form)
-
-
-class CustomerLogoutView(RedirectView):
-    pattern_name = "lupanes:customer-login"
-
-    def get_redirect_url(self, *args, **kwargs):
-        try:
-            del self.request.session["customer_id"]
-        except KeyError:
-            pass
-        return super().get_redirect_url(*args, **kwargs)
+User = get_user_model()
 
 
 class DeliveryNoteCreateView(CustomerAuthMixin, CreateView):
@@ -47,14 +27,14 @@ class DeliveryNoteCreateView(CustomerAuthMixin, CreateView):
 
     def get_form_kwargs(self) -> Dict[str, Any]:
         kwargs = super().get_form_kwargs()
-        kwargs["customer"] = self.customer
+        kwargs["customer"] = self.request.user
         return kwargs
 
     def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
         context = super().get_context_data(**kwargs)
         today = timezone.now().date()
         context["deliverynotes_today"] = DeliveryNote.objects.filter(
-            customer=self.customer, date__date=today,
+            customer=self.request.user, date__date=today,
         )
         return context
 
@@ -66,7 +46,7 @@ class DeliveryNoteUpdateView(CustomerAuthMixin, UpdateView):
 
     def get_queryset(self) -> QuerySet[Any]:
         today = timezone.now().date()
-        return DeliveryNote.objects.filter(customer=self.customer, date__date=today)
+        return DeliveryNote.objects.filter(customer=self.request.user, date__date=today)
 
 
 class DeliveryNoteDeleteView(CustomerAuthMixin, DeleteView):
@@ -75,7 +55,7 @@ class DeliveryNoteDeleteView(CustomerAuthMixin, DeleteView):
 
     def get_queryset(self) -> QuerySet[Any]:
         today = timezone.now().date()
-        return DeliveryNote.objects.filter(customer=self.customer, date__date=today)
+        return DeliveryNote.objects.filter(customer=self.request.user, date__date=today)
 
 
 class ProductAjaxView(CustomerAuthMixin, DetailView):

@@ -32,7 +32,7 @@
       {% for customer in object_list %}
       <tr>
         <td>{{ forloop.counter }}</td>
-        <td>{{ customer.name }}</td>
+        <td>{{ customer.username }}</td>
         <td class="amount">{{ customer.total|floatformat:2 }}</td>
       </tr>
       {% endfor %}

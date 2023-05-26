@@ -1,21 +1,10 @@
 from django import forms
+from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 
-from lupanes.models import Customer, DeliveryNote, ProductPrice
+from lupanes.models import DeliveryNote, ProductPrice
 
-
-class CustomerAuthForm(forms.Form):
-    name = forms.CharField()
-
-    def clean_name(self):
-        name = self.cleaned_data["name"].strip()
-        try:
-            customer = Customer.objects.get(name__iexact=name)
-        except Customer.DoesNotExist:
-            raise ValidationError("No se ha encontrado ninguna nevera con el nombre proporcionado.")
-        else:
-            self.customer_id = customer.pk
-        return customer.name
+User = get_user_model()
 
 
 class DeliveryNoteCreateForm(forms.ModelForm):

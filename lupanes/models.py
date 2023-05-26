@@ -1,20 +1,13 @@
+from django.contrib.auth import get_user_model
 from django.db import models
 from django.utils import timezone
 
-
-class Customer(models.Model):
-    """Nevera"""
-    name = models.CharField(max_length=255, unique=True)
-    email = models.EmailField()
-    is_active = models.BooleanField(default=True)
-
-    def __str__(self) -> str:
-        return f"{self.name} ({self.email})"
+User = get_user_model()
 
 
 class DeliveryNote(models.Model):
     """Albarán"""
-    customer = models.ForeignKey("Customer", on_delete=models.PROTECT)
+    customer = models.ForeignKey(User, on_delete=models.PROTECT)
     date = models.DateTimeField(auto_now_add=True)
     product = models.ForeignKey("Product", on_delete=models.PROTECT)
     quantity = models.DecimalField("Cantidad", max_digits=6, decimal_places=3)
