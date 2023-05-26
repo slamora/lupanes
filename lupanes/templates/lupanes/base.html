@@ -42,10 +42,18 @@
         <div class="collapse navbar-collapse" id="navbarsExample04">
           {% with request.resolver_match.url_name as url_name %}
           <ul class="navbar-nav me-auto mb-2 mb-md-0">
+            {% if request.user.is_customer %}
             <li class="nav-item">
               <a class="nav-link {% if url_name == 'deliverynote-new' %}active" aria-current="page"{% else %}" {% endif %}
                 href="{% url 'lupanes:deliverynote-new' %}">Nuevo albarán</a>
             </li>
+            {% endif %}
+            {% if request.user.is_manager %}
+            <li class="nav-item">
+              <a class="nav-link {% if url_name == 'deliverynote-list' %}active" aria-current="page"{% else %}" {% endif %}
+                href="{% url 'lupanes:deliverynote-list' %}">Listado de albaranes</a>
+            </li>
+            {% endif %}
             <li class="nav-item">
               <a class="nav-link {% if url_name == 'product-list' %}active" aria-current="page"{% else %}"  {% endif %}
                 href="{% url 'lupanes:product-list' %}">Lista de precios</a>
