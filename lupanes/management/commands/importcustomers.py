@@ -5,6 +5,8 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
 from django.core.management.base import BaseCommand
 
+from lupanes.users.mixins import CUSTOMERS_GROUP
+
 User = get_user_model()
 
 
@@ -20,7 +22,7 @@ class Command(BaseCommand):
             user = User.objects.create(username=username)
             customers.append(user)
 
-        customers_group, _ = Group.objects.get_or_create(name="neveras")
+        customers_group, _ = Group.objects.get_or_create(name=CUSTOMERS_GROUP)
         qs_current_users = list(customers_group.user_set.all())
         customers_group.user_set.set(qs_current_users + customers)
 
