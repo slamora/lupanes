@@ -5,8 +5,9 @@ from typing import Any, Dict
 from django.contrib.auth import get_user_model
 from django.db.models import QuerySet
 from django.utils import timezone
-from django.views.generic import ListView
+from django.views.generic import ListView, RedirectView
 from django.views.generic.dates import MonthArchiveView
+from django.urls import reverse
 
 from lupanes import helpers
 from lupanes.models import DeliveryNote
@@ -24,9 +25,18 @@ class CustomerListView(ManagerAuthMixin, ListView):
         return User.objects.filter(is_active=True, groups__name="neveras")
 
 
+class DeliveryNoteCurrentMonthArchiveView(ManagerAuthMixin, RedirectView):
+    permanent = False
+
+    def get_redirect_url(self, *args, **kwargs):
+        now = timezone.now()
+        return reverse("lupanes:deliverynote-month", args=(now.year, now.month))
+
+
 class DeliveryNoteMonthArchiveView(ManagerAuthMixin, MonthArchiveView):
     queryset = DeliveryNote.objects.all()
     date_field = "date"
+    allow_empty = True
 
 
 class DeliveryNoteListView(ManagerAuthMixin, ListView):

@@ -51,7 +51,7 @@
             {% if request.user.is_manager %}
             <li class="nav-item">
               <a class="nav-link {% if url_name == 'deliverynote-list' %}active" aria-current="page"{% else %}" {% endif %}
-                href="{% url 'lupanes:deliverynote-list' %}">Albaranes</a>
+                href="{% url 'lupanes:deliverynote-current-month' %}">Albaranes</a>
             </li>
             <li class="nav-item">
               <a class="nav-link {% if url_name == 'customer-list' %}active" aria-current="page"{% else %}" {% endif %}
