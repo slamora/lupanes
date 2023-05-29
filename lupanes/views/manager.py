@@ -6,6 +6,7 @@ from django.contrib.auth import get_user_model
 from django.db.models import QuerySet
 from django.utils import timezone
 from django.views.generic import ListView
+from django.views.generic.dates import MonthArchiveView
 
 from lupanes import helpers
 from lupanes.models import DeliveryNote
@@ -21,6 +22,11 @@ class CustomerListView(ManagerAuthMixin, ListView):
 
     def get_queryset(self) -> QuerySet[User]:
         return User.objects.filter(is_active=True, groups__name="neveras")
+
+
+class DeliveryNoteMonthArchiveView(ManagerAuthMixin, MonthArchiveView):
+    queryset = DeliveryNote.objects.all()
+    date_field = "date"
 
 
 class DeliveryNoteListView(ManagerAuthMixin, ListView):
