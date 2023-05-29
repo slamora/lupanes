@@ -27,6 +27,15 @@ urlpatterns = [
     path('auth/reset/done/',
          auth_views.PasswordResetCompleteView.as_view(template_name='users/password_reset_complete.html'),
          name='password_reset_complete'),
+    path(
+        'auth/password_change/',
+        auth_views.PasswordChangeView.as_view(
+            template_name='users/password_change.html',
+            success_url=reverse_lazy('users:customer-profile')
+        ),
+        name='password-change'
+    ),
+    path('auth/profile/', views.CustomerProfileView.as_view(), name='customer-profile'),
 
     path('neveras/new/', views.CustomerCreateView.as_view(), name='customer-new'),
 ]

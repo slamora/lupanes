@@ -100,8 +100,13 @@
               </button>
               <ul class="dropdown-menu dropdown-menu-end">
                 <li>
+                  <a class="dropdown-item" href="{% url 'users:customer-profile' %}">
+                    <i class="fa-regular fa-user me-2"></i> Mi nevera
+                  </a>
+                </li>
+                <li>
                   <a class="dropdown-item" href="{% url 'users:logout' %}">
-                    salir
+                    <i class="fa-solid fa-arrow-right-from-bracket me-2"></i> Salir
                   </a>
                 </li>
               </ul>
