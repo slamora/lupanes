@@ -1,13 +1,11 @@
-from django.contrib.auth import get_user_model
+from django.conf import settings
 from django.db import models
 from django.utils import timezone
-
-User = get_user_model()
 
 
 class DeliveryNote(models.Model):
     """Albarán"""
-    customer = models.ForeignKey(User, on_delete=models.PROTECT)
+    customer = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
     date = models.DateTimeField(auto_now_add=True)
     product = models.ForeignKey("Product", on_delete=models.PROTECT)
     quantity = models.DecimalField("Cantidad", max_digits=6, decimal_places=3)
