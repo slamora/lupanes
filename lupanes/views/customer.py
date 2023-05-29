@@ -10,7 +10,8 @@ from django.http import (HttpRequest, HttpResponse, HttpResponseRedirect,
 from django.shortcuts import get_object_or_404
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
-from django.views.generic import DetailView, ListView
+from django.views.generic import DetailView, ListView, RedirectView
+from django.views.generic.dates import MonthArchiveView
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
 
 from lupanes.forms import DeliveryNoteCreateForm, ProductPriceForm
@@ -56,6 +57,25 @@ class DeliveryNoteDeleteView(CustomerAuthMixin, DeleteView):
     def get_queryset(self) -> QuerySet[Any]:
         today = timezone.now().date()
         return DeliveryNote.objects.filter(customer=self.request.user, date__date=today)
+
+
+class CustomerDeliveryNoteCurrentMonthArchiveView(CustomerAuthMixin, RedirectView):
+    permanent = False
+
+    def get_redirect_url(self, *args, **kwargs):
+        now = timezone.now()
+        return reverse("lupanes:deliverynote-month-customer", args=(now.year, now.month))
+
+
+class CustomerDeliveryNoteMonthArchiveView(CustomerAuthMixin, MonthArchiveView):
+    template_name = "lupanes/my_deliverynote_archive_month.html"
+    queryset = DeliveryNote.objects.all()
+    date_field = "date"
+    allow_empty = True
+
+    def get_queryset(self) -> QuerySet[Any]:
+        qs = super().get_queryset()
+        return qs.filter(customer=self.request.user)
 
 
 class ProductAjaxView(CustomerAuthMixin, DetailView):
