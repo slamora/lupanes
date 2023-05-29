@@ -58,3 +58,18 @@ Schedule management command to send emails regularly via cron:
 * * * * * (/usr/bin/python manage.py send_queued_mail >> send_mail.log 2>&1)
 ```
 More configuration options on [django-post-office](https://github.com/ui/django-post_office).
+
+
+## Configure database backups
+You can take advantage of scripts located on `/scripts` to automatize your database backups.
+Tune your settings and add this line to your cron:
+```sh
+crontab -e
+```
+
+```sh
+# execute it daily at 2am
+# m h  dom mon dow   command
+0 2 * * * ~/lupanes/scripts/database_backup.sh
+
+```

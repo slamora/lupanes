@@ -111,6 +111,9 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
+AUTH_USER_MODEL = "users.User"
+
+
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
 
@@ -172,6 +175,6 @@ POST_OFFICE = {
 # Authentication
 LOGIN_URL = 'users:login'
 
-LOGIN_REDIRECT_URL = 'lupanes:deliverynote-list'
+LOGIN_REDIRECT_URL = 'lupanes:product-list'
 
 LOGOUT_REDIRECT_URL = LOGIN_URL

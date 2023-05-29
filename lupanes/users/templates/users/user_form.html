@@ -1,0 +1,16 @@
+{% extends "lupanes/base.html" %}
+{% load django_bootstrap5 %}
+
+{% block main %}
+<h1>Nueva nevera</h1>
+
+<div class="bg-light p-4 rounded-2 border border-secondary mb-4">
+  <form class="form" method="post">
+    {% csrf_token %}
+
+    {% bootstrap_form form %}
+
+    {% bootstrap_button button_type="submit" content="Crear" %}
+  </form>
+</div>
+{% endblock %}

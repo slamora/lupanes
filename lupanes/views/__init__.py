@@ -7,9 +7,10 @@ from lupanes.views.customer import (
     ProductUpdateView,
     ProductNewPriceView,
 )
-from lupanes.views.manager import DeliveryNoteListView, DeliveryNoteSummaryView
+from lupanes.views.manager import DeliveryNoteListView, DeliveryNoteSummaryView, CustomerListView
 
 __all__ = [
+    "CustomerListView",
     "DeliveryNoteCreateView",
     "DeliveryNoteDeleteView",
     "DeliveryNoteUpdateView",

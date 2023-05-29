@@ -51,12 +51,16 @@
             {% if request.user.is_manager %}
             <li class="nav-item">
               <a class="nav-link {% if url_name == 'deliverynote-list' %}active" aria-current="page"{% else %}" {% endif %}
-                href="{% url 'lupanes:deliverynote-list' %}">Listado de albaranes</a>
+                href="{% url 'lupanes:deliverynote-list' %}">Albaranes</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link {% if url_name == 'customer-list' %}active" aria-current="page"{% else %}" {% endif %}
+                href="{% url 'lupanes:customer-list' %}">Neveras</a>
             </li>
             {% endif %}
             <li class="nav-item">
               <a class="nav-link {% if url_name == 'product-list' %}active" aria-current="page"{% else %}"  {% endif %}
-                href="{% url 'lupanes:product-list' %}">Lista de precios</a>
+                href="{% url 'lupanes:product-list' %}">Precios</a>
             </li>
             <li class="nav-item">
               <a class="nav-link disabled">Ayuda</a>
@@ -96,8 +100,13 @@
               </button>
               <ul class="dropdown-menu dropdown-menu-end">
                 <li>
+                  <a class="dropdown-item" href="{% url 'users:customer-profile' %}">
+                    <i class="fa-regular fa-user me-2"></i> Mi nevera
+                  </a>
+                </li>
+                <li>
                   <a class="dropdown-item" href="{% url 'users:logout' %}">
-                    salir
+                    <i class="fa-solid fa-arrow-right-from-bracket me-2"></i> Salir
                   </a>
                 </li>
               </ul>

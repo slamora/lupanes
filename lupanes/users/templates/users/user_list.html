@@ -1,0 +1,35 @@
+{% extends "lupanes/base.html" %}
+{% load django_bootstrap5 %}
+
+{% block main %}
+<div class="d-flex justify-content-between">
+  <h1>Listado de neveras</h1>
+  <div class="">
+    <a class="btn btn-primary" href="{% url 'users:customer-new' %}">
+      <i class="fa-solid fa-plus"></i> Nueva nevera</a>
+  </div>
+</div>
+
+<div class="table-responsive">
+  <table class="table table-sm table-striped">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Nombre</th>
+        <th>E-mail</th>
+        <th>Grupos</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for customer in object_list %}
+      <tr>
+        <td>{{ forloop.counter }}</td>
+        <td>{{ customer.username }}</td>
+        <td>{{ customer.email }}</td>
+        <td>{{ customer.groups.all|join:", " }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

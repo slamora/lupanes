@@ -14,6 +14,15 @@ from lupanes.users.mixins import ManagerAuthMixin
 User = get_user_model()
 
 
+# TODO: move to users module???
+class CustomerListView(ManagerAuthMixin, ListView):
+    template_name = "users/user_list.html"
+    model = User
+
+    def get_queryset(self) -> QuerySet[User]:
+        return User.objects.filter(is_active=True, groups__name="neveras")
+
+
 class DeliveryNoteListView(ManagerAuthMixin, ListView):
     model = DeliveryNote
 
