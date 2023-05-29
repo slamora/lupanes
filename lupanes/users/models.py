@@ -3,6 +3,7 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 from lupanes.users.validators import CustomUnicodeUsernameValidator
+from lupanes.users import CUSTOMERS_GROUP, MANAGERS_GROUP
 
 
 class User(AbstractUser):
@@ -27,3 +28,11 @@ class User(AbstractUser):
             "unique": _("A user with that username already exists."),
         },
     )
+
+    @property
+    def is_customer(self):
+        return self.groups.filter(name=CUSTOMERS_GROUP).exists()
+
+    @property
+    def is_manager(self):
+        return self.groups.filter(name=MANAGERS_GROUP).exists()

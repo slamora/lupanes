@@ -5,7 +5,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
 from django.core.management.base import BaseCommand
 
-from lupanes.users.mixins import CUSTOMERS_GROUP
+from lupanes.users import CUSTOMERS_GROUP
 
 User = get_user_model()
 
