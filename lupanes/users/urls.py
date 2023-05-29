@@ -1,6 +1,9 @@
 from django.contrib.auth import views as auth_views
 from django.urls import path, reverse_lazy
 
+from lupanes.users import views
+
+
 app_name = 'users'
 
 urlpatterns = [
@@ -24,4 +27,6 @@ urlpatterns = [
     path('auth/reset/done/',
          auth_views.PasswordResetCompleteView.as_view(template_name='users/password_reset_complete.html'),
          name='password_reset_complete'),
+
+    path('neveras/new/', views.CustomerCreateView.as_view(), name='customer-new'),
 ]
