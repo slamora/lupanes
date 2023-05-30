@@ -1,0 +1,55 @@
+{% extends "lupanes/base.html" %}
+{% load django_bootstrap5 %}
+
+{% block main %}
+<h1>Listado de albaranes</h1>
+
+<ul class="list-inline">
+  {% if previous_month %}
+  <li class="list-inline-item">
+    <a href="{% url 'lupanes:deliverynote-month-customer' previous_month.year previous_month.month %}">
+      <i class="fa-solid fa-arrow-left"></i> {{ previous_month|date:"F Y" }}</a>
+    </li>
+  {% endif %}
+  <li class="list-inline-item">
+    <strong>{{ month|date:"F Y" }}</strong>
+  </li>
+  {% if next_month %}
+  <li class="list-inline-item">
+  <a href="{% url 'lupanes:deliverynote-month-customer' next_month.year next_month.month %}">
+    {{ next_month|date:"F Y" }} <i class="fa-solid fa-arrow-right"></i></a>
+  </li>
+  {% endif %}
+</ul>
+
+<div class="table-responsive">
+  <table class="table table-sm table-striped">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Fecha</th>
+        <th>Nevera</th>
+        <th>Producto</th>
+        <th>Cantidad</th>
+        <th>Importe</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for note in object_list %}
+      <tr>
+        <td>{{ forloop.counter }}</td>
+        <td>{{ note.date|date:"SHORT_DATE_FORMAT" }}</td>
+        <td>{{ note.customer.username }}</td>
+        <td>{{ note.product.name }}</td>
+        <td class="text-nowrap">
+          {% if note.product.unit_accept_decimals %}{{ note.quantity }}
+          {% else %}{{ note.quantity|floatformat:0 }}{% endif %}
+          {{ note.product.unit }}
+        </td>
+        <td>{{ note.amount|floatformat:2 }} €</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock main %}

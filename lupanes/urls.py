@@ -5,11 +5,20 @@ from lupanes import views
 app_name = "lupanes"
 
 urlpatterns = [
-    path('albaran/', views.DeliveryNoteListView.as_view(), name='deliverynote-list'),
-    path('albaran/summary/', views.DeliveryNoteSummaryView.as_view(), name='deliverynote-summary'),
     path('albaran/new/', views.DeliveryNoteCreateView.as_view(), name='deliverynote-new'),
     path('albaran/<int:pk>/edit/', views.DeliveryNoteUpdateView.as_view(), name='deliverynote-edit'),
     path('albaran/<int:pk>/delete/', views.DeliveryNoteDeleteView.as_view(), name='deliverynote-delete'),
+
+    path('mis-albaranes/', views.CustomerDeliveryNoteCurrentMonthArchiveView.as_view(),
+         name='deliverynote-current-month-customer'),
+    path('mis-albaranes/<int:year>/<int:month>/', views.CustomerDeliveryNoteMonthArchiveView.as_view(month_format="%m"),
+         name='deliverynote-month-customer'),
+
+    path('albaranes/', views.DeliveryNoteCurrentMonthArchiveView.as_view(), name='deliverynote-current-month'),
+    path('albaranes/<int:year>/<int:month>/', views.DeliveryNoteMonthArchiveView.as_view(month_format="%m"),
+         name='deliverynote-month'),
+    path('albaranes/<int:year>/<int:month>/summary/', views.DeliveryNoteSummaryView.as_view(month_format="%m"),
+         name='deliverynote-summary'),
 
     path('neveras/', views.CustomerListView.as_view(), name='customer-list'),
 

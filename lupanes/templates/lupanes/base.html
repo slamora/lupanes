@@ -47,21 +47,36 @@
               <a class="nav-link {% if url_name == 'deliverynote-new' %}active" aria-current="page"{% else %}" {% endif %}
                 href="{% url 'lupanes:deliverynote-new' %}">Nuevo albarán</a>
             </li>
-            {% endif %}
-            {% if request.user.is_manager %}
             <li class="nav-item">
-              <a class="nav-link {% if url_name == 'deliverynote-list' %}active" aria-current="page"{% else %}" {% endif %}
-                href="{% url 'lupanes:deliverynote-list' %}">Albaranes</a>
+              <a class="nav-link {% if url_name == 'deliverynote-month-customer' %}active" aria-current="page"{% else %}" {% endif %}
+              href="{% url 'lupanes:deliverynote-current-month-customer' %}">Mis albaranes</a>
             </li>
-            <li class="nav-item">
-              <a class="nav-link {% if url_name == 'customer-list' %}active" aria-current="page"{% else %}" {% endif %}
-                href="{% url 'lupanes:customer-list' %}">Neveras</a>
-            </li>
-            {% endif %}
             <li class="nav-item">
               <a class="nav-link {% if url_name == 'product-list' %}active" aria-current="page"{% else %}"  {% endif %}
                 href="{% url 'lupanes:product-list' %}">Precios</a>
             </li>
+            {% endif %}
+
+            {% if request.user.is_manager %}
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">Gestión</a>
+              <ul class="dropdown-menu">
+                <li>
+                  <a class="dropdown-item {% if url_name == 'deliverynote-month' %}active" aria-current="page"{% else %}" {% endif %}
+                  href="{% url 'lupanes:deliverynote-current-month' %}">Albaranes</a>
+                </li>
+                <li>
+                  <a class="dropdown-item {% if url_name == 'customer-list' %}active" aria-current="page"{% else %}" {% endif %}
+                  href="{% url 'lupanes:customer-list' %}">Neveras</a>
+                </li>
+                <li>
+                  <a class="dropdown-item {% if url_name == 'product-list' %}active" aria-current="page"{% else %}"  {% endif %}
+                    href="{% url 'lupanes:product-list' %}">Productos</a>
+                </li>
+              </ul>
+            </li>
+            {% endif %}
+
             <li class="nav-item">
               <a class="nav-link disabled">Ayuda</a>
             </li>

@@ -5,22 +5,27 @@
 <h1>Listado de albaranes</h1>
 
 <ul class="list-inline">
+  {% if previous_month %}
   <li class="list-inline-item">
-    <h2>{{ month.year }}</h2>
-  </li>
-  {% for i, name in choices.items %}
+    <a href="{% url 'lupanes:deliverynote-month' previous_month.year previous_month.month %}">
+      <i class="fa-solid fa-arrow-left"></i> {{ previous_month|date:"F Y" }}</a>
+    </li>
+  {% endif %}
   <li class="list-inline-item">
-    {% if i == month.month %}
-    <strong>{{ name }}</strong>
-    {% else %}
-    <a href="{% url 'lupanes:deliverynote-list' %}?month={{ i }}">{{ name }}</a>
-    {% endif %}
+    <strong>{{ month|date:"F Y" }}</strong>
   </li>
-  {% endfor %}
+  {% if next_month %}
+  <li class="list-inline-item">
+  <a href="{% url 'lupanes:deliverynote-month' next_month.year next_month.month %}">
+    {{ next_month|date:"F Y" }} <i class="fa-solid fa-arrow-right"></i></a>
+  </li>
+  {% endif %}
+</ul>
+
 </ul>
 
 <div class="mb-3">
-  <a class="btn btn-outline-success" href="{% url 'lupanes:deliverynote-summary' %}?month={{ month.month }}">Ver resumen
+  <a class="btn btn-outline-success" href="{% url 'lupanes:deliverynote-summary' month.year month.month %}">Ver resumen
     del mes por neveras</a>
 </div>
 

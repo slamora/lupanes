@@ -56,14 +56,33 @@
     </tr>
     {% endfor %}
   </tbody>
+  {% if deliverynotes_today %}
+  <tfoot>
+    <tr>
+      <td colspan="2"></td>
+      <td><strong>TOTAL</strong></td>
+      <td><strong>{{ total_amount|floatformat:2 }} €</strong></td>
+      <td></td>
+    </tr>
+  </tfoot>
+  {% endif %}
 </table>
-<div class="alert alert-primary" role="alert">
+<div class="alert alert-light" role="alert">
   <strong>NOTA:</strong>
   Los precios son orientativos (puede ser que en el momento de registrar el albarán todavía esté pendiente de
   actualizarse el último precio del producto).
 </div>
 
 <h2 id="new-deliverynote" class="mt-5">Nuevo albarán</h2>
+
+<div class="mt-3 alert alert-primary d-flex align-items-center" role="alert">
+
+  <i class="fa-solid fa-lightbulb fa-lg me-3"></i>
+  <div>
+    Los albaranes se registran <strong>automáticamente</strong> al enviarse. Una vez enviado puedes modificarlo o borrarlo
+    <strong>hasta el final del día</strong>.
+  </div>
+</div>
 {% endif %}
 
 <div class="bg-light p-4 rounded-2 border border-secondary">

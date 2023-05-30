@@ -10,7 +10,10 @@ from django.http import (HttpRequest, HttpResponse, HttpResponseRedirect,
 from django.shortcuts import get_object_or_404
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
-from django.views.generic import DetailView, ListView
+from django.utils.translation import gettext as _
+from django.utils.html import mark_safe
+from django.views.generic import DetailView, ListView, RedirectView
+from django.views.generic.dates import MonthArchiveView
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
 
 from lupanes.forms import DeliveryNoteCreateForm, ProductPriceForm
@@ -33,10 +36,21 @@ class DeliveryNoteCreateView(CustomerAuthMixin, CreateView):
     def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
         context = super().get_context_data(**kwargs)
         today = timezone.now().date()
-        context["deliverynotes_today"] = DeliveryNote.objects.filter(
+        qs = self.model.objects.filter(
             customer=self.request.user, date__date=today,
         )
+        total = sum(note.amount() for note in qs)
+        context.update({
+            "deliverynotes_today": qs,
+            "total_amount": total,
+        })
         return context
+
+    def form_valid(self, form: BaseModelForm) -> HttpResponse:
+        msg = mark_safe("Albarán registrado correctamente. Si lo necesitas, tienes "
+                        "<strong>hasta el final del día</strong> para editarlo o borrarlo.")
+        messages.success(self.request, _(msg))
+        return super().form_valid(form)
 
 
 class DeliveryNoteUpdateView(CustomerAuthMixin, UpdateView):
@@ -56,6 +70,26 @@ class DeliveryNoteDeleteView(CustomerAuthMixin, DeleteView):
     def get_queryset(self) -> QuerySet[Any]:
         today = timezone.now().date()
         return DeliveryNote.objects.filter(customer=self.request.user, date__date=today)
+
+
+class CustomerDeliveryNoteCurrentMonthArchiveView(CustomerAuthMixin, RedirectView):
+    permanent = False
+
+    def get_redirect_url(self, *args, **kwargs):
+        now = timezone.now()
+        return reverse("lupanes:deliverynote-month-customer", args=(now.year, now.month))
+
+
+class CustomerDeliveryNoteMonthArchiveView(CustomerAuthMixin, MonthArchiveView):
+    template_name = "lupanes/my_deliverynote_archive_month.html"
+    queryset = DeliveryNote.objects.all()
+    date_field = "date"
+    ordering = "date"
+    allow_empty = True
+
+    def get_queryset(self) -> QuerySet[Any]:
+        qs = super().get_queryset()
+        return qs.filter(customer=self.request.user)
 
 
 class ProductAjaxView(CustomerAuthMixin, DetailView):
