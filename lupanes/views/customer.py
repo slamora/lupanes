@@ -36,9 +36,14 @@ class DeliveryNoteCreateView(CustomerAuthMixin, CreateView):
     def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
         context = super().get_context_data(**kwargs)
         today = timezone.now().date()
-        context["deliverynotes_today"] = DeliveryNote.objects.filter(
+        qs = self.model.objects.filter(
             customer=self.request.user, date__date=today,
         )
+        total = sum(note.amount() for note in qs)
+        context.update({
+            "deliverynotes_today": qs,
+            "total_amount": total,
+        })
         return context
 
     def form_valid(self, form: BaseModelForm) -> HttpResponse:

@@ -56,6 +56,16 @@
     </tr>
     {% endfor %}
   </tbody>
+  {% if deliverynotes_today %}
+  <tfoot>
+    <tr>
+      <td colspan="2"></td>
+      <td><strong>TOTAL</strong></td>
+      <td><strong>{{ total_amount|floatformat:2 }} €</strong></td>
+      <td></td>
+    </tr>
+  </tfoot>
+  {% endif %}
 </table>
 <div class="alert alert-light" role="alert">
   <strong>NOTA:</strong>
