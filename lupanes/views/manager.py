@@ -1,4 +1,3 @@
-import calendar
 from decimal import Decimal
 from typing import Any, Dict
 
@@ -37,33 +36,6 @@ class DeliveryNoteMonthArchiveView(ManagerAuthMixin, MonthArchiveView):
     queryset = DeliveryNote.objects.all()
     date_field = "date"
     allow_empty = True
-
-
-class DeliveryNoteListView(ManagerAuthMixin, ListView):
-    model = DeliveryNote
-
-    def get_queryset(self) -> QuerySet[Any]:
-        value = self.request.GET.get("month")
-        self.month = helpers.clean_month(value)
-
-        return DeliveryNote.objects.filter(
-            date__date__year=self.month.year,
-            date__date__month=self.month.month,
-        )
-
-    def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
-        context = super().get_context_data(**kwargs)
-        today = timezone.now().date()
-        choices = {
-            i: calendar.month_name[i]
-            for i in range(1, today.month + 1)
-        }
-
-        context.update({
-            "month": self.month,
-            "choices": choices,
-        })
-        return context
 
 
 class DeliveryNoteSummaryView(ManagerAuthMixin, ListView):
