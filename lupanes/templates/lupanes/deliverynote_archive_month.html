@@ -5,23 +5,22 @@
 <h1>Listado de albaranes</h1>
 
 <ul class="list-inline">
+  {% if previous_month %}
   <li class="list-inline-item">
-    {% if previous_month %}
-    <a href="{% url 'lupanes:deliverynote-month' previous_month.year previous_month.month %}">{{ previous_month|date:"F Y" }}</a>
-    {% else %}
-    {{ previous_month|date:"F Y" }}
-    {% endif %}
-  </li>
+    <a href="{% url 'lupanes:deliverynote-month' previous_month.year previous_month.month %}">
+      <i class="fa-solid fa-arrow-left"></i> {{ previous_month|date:"F Y" }}</a>
+    </li>
+  {% endif %}
   <li class="list-inline-item">
     <strong>{{ month|date:"F Y" }}</strong>
   </li>
-  <li class="list-inline-item">
   {% if next_month %}
-  <a href="{% url 'lupanes:deliverynote-month' next_month.year next_month.month %}">{{ next_month|date:"F Y" }}</a>
-  {% else %}
-  {{ next_month|date:"F Y" }}
+  <li class="list-inline-item">
+  <a href="{% url 'lupanes:deliverynote-month' next_month.year next_month.month %}">
+    {{ next_month|date:"F Y" }} <i class="fa-solid fa-arrow-right"></i></a>
+  </li>
   {% endif %}
-</li>
+</ul>
 
 </ul>
 
