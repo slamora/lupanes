@@ -1,14 +1,14 @@
+import datetime
 from decimal import Decimal
 from typing import Any, Dict
 
 from django.contrib.auth import get_user_model
 from django.db.models import QuerySet
+from django.urls import reverse
 from django.utils import timezone
 from django.views.generic import ListView, RedirectView
-from django.views.generic.dates import MonthArchiveView
-from django.urls import reverse
+from django.views.generic.dates import MonthArchiveView, MonthMixin, YearMixin
 
-from lupanes import helpers
 from lupanes.models import DeliveryNote
 from lupanes.users.mixins import ManagerAuthMixin
 
@@ -38,19 +38,21 @@ class DeliveryNoteMonthArchiveView(ManagerAuthMixin, MonthArchiveView):
     allow_empty = True
 
 
-class DeliveryNoteSummaryView(ManagerAuthMixin, ListView):
+class DeliveryNoteSummaryView(ManagerAuthMixin, YearMixin, MonthMixin, ListView):
     template_name = "lupanes/deliverynote_summary.html"
+    date_field = "date"
 
     def get_queryset(self) -> QuerySet[Any]:
-        value = self.request.GET.get("month")
-        self.period = helpers.clean_month(value)
+        year = self.kwargs["year"]
+        month = self.kwargs["month"]
+        self.period = datetime.datetime(year=year, month=month, day=1)
 
         qs = User.objects.filter(is_active=True)
         for customer in qs:
             customer.total = Decimal(0)
             notes = customer.deliverynote_set.filter(
-                date__date__year=self.period.year,
-                date__date__month=self.period.month,
+                date__date__year=year,
+                date__date__month=month,
             )
             for note in notes:
                 customer.total += note.amount()
