@@ -10,6 +10,8 @@ from django.http import (HttpRequest, HttpResponse, HttpResponseRedirect,
 from django.shortcuts import get_object_or_404
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
+from django.utils.translation import gettext as _
+from django.utils.html import mark_safe
 from django.views.generic import DetailView, ListView, RedirectView
 from django.views.generic.dates import MonthArchiveView
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
@@ -38,6 +40,12 @@ class DeliveryNoteCreateView(CustomerAuthMixin, CreateView):
             customer=self.request.user, date__date=today,
         )
         return context
+
+    def form_valid(self, form: BaseModelForm) -> HttpResponse:
+        msg = mark_safe("Albarán registrado correctamente. Si lo necesitas, tienes "
+                        "<strong>hasta el final del día</strong> para editarlo o borrarlo.")
+        messages.success(self.request, _(msg))
+        return super().form_valid(form)
 
 
 class DeliveryNoteUpdateView(CustomerAuthMixin, UpdateView):
