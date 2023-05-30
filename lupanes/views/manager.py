@@ -35,6 +35,7 @@ class DeliveryNoteCurrentMonthArchiveView(ManagerAuthMixin, RedirectView):
 class DeliveryNoteMonthArchiveView(ManagerAuthMixin, MonthArchiveView):
     queryset = DeliveryNote.objects.all()
     date_field = "date"
+    ordering = "date"
     allow_empty = True
 
 

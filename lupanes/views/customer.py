@@ -79,6 +79,7 @@ class CustomerDeliveryNoteMonthArchiveView(CustomerAuthMixin, MonthArchiveView):
     template_name = "lupanes/my_deliverynote_archive_month.html"
     queryset = DeliveryNote.objects.all()
     date_field = "date"
+    ordering = "date"
     allow_empty = True
 
     def get_queryset(self) -> QuerySet[Any]:
