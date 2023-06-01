@@ -183,6 +183,8 @@ EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD', default='')
 
 EMAIL_PORT = env('EMAIL_PORT', default=25, cast=int)
 
+EMAIL_SUBJECT_PREFIX = env('EMAIL_SUBJECT_PREFIX', default='[albaranes] ')
+
 EMAIL_USE_TLS = env('EMAIL_USE_TLS', default=False, cast=bool)
 
 EMAIL_USE_SSL = env('EMAIL_USE_SSL', default=False, cast=bool)

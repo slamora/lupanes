@@ -4,7 +4,7 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.core.mail import send_mail
+from django.core.mail import mail_managers, send_mail
 from django.db.models import QuerySet
 from django.forms.models import BaseModelForm
 from django.http import (HttpRequest, HttpResponse, HttpResponseRedirect,
@@ -83,20 +83,22 @@ class NotifyMissingProductView(CustomerAuthMixin, FormView):
 
     def form_valid(self, form: Any) -> HttpResponse:
         response = super().form_valid(form)
-        messages.success(self.request, "Se ha notificado correctamente que falta un producto. ¡Gracias!")
         form.cleaned_data["customer"] = self.request.user.username
         self.send_email(form)
+        messages.success(self.request, "Se ha notificado correctamente que falta un producto. ¡Gracias!")
         return response
 
     def send_email(self, form):
         from_email = settings.DEFAULT_FROM_EMAIL
-        to_emails = settings.MANAGERS + [self.request.user.email]
+        to_emails = [self.request.user.email]
         subject = "Falta un producto - App Lupierra"
         context = {
             "form": form,
         }
         message = render_to_string("emails/missing_product.txt", context=context, request=self.request)
+
         send_mail(subject, message, from_email, to_emails, fail_silently=False)
+        mail_managers(subject, message, fail_silently=False)
 
 
 class CustomerDeliveryNoteCurrentMonthArchiveView(CustomerAuthMixin, RedirectView):
