@@ -1,8 +1,12 @@
+import json
 from typing import Any, Dict
 
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.mail import send_mail
+from django.core.serializers.json import DjangoJSONEncoder
 from django.db.models import QuerySet
 from django.forms.models import BaseModelForm
 from django.http import (HttpRequest, HttpResponse, HttpResponseRedirect,
@@ -10,13 +14,14 @@ from django.http import (HttpRequest, HttpResponse, HttpResponseRedirect,
 from django.shortcuts import get_object_or_404
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
-from django.utils.translation import gettext as _
 from django.utils.html import mark_safe
-from django.views.generic import DetailView, ListView, RedirectView
+from django.utils.translation import gettext as _
+from django.views.generic import DetailView, FormView, ListView, RedirectView
 from django.views.generic.dates import MonthArchiveView
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
 
-from lupanes.forms import DeliveryNoteCreateForm, ProductPriceForm
+from lupanes.forms import (DeliveryNoteCreateForm, NotifyMissingProductForm,
+                           ProductPriceForm)
 from lupanes.models import DeliveryNote, Product
 from lupanes.users.mixins import CustomerAuthMixin
 
@@ -70,6 +75,33 @@ class DeliveryNoteDeleteView(CustomerAuthMixin, DeleteView):
     def get_queryset(self) -> QuerySet[Any]:
         today = timezone.now().date()
         return DeliveryNote.objects.filter(customer=self.request.user, date__date=today)
+
+
+class NotifyMissingProductView(CustomerAuthMixin, FormView):
+    form_class = NotifyMissingProductForm
+    template_name = "lupanes/deliverynote_notify_missing_product.html"
+    success_url = reverse_lazy("lupanes:deliverynote-new")
+
+    def form_valid(self, form: Any) -> HttpResponse:
+        response = super().form_valid(form)
+        messages.success(self.request, "Se ha notificado correctamente que falta un producto. ¡Gracias!")
+        form.cleaned_data["customer"] = self.request.user.username
+        self.send_email(form)
+        return response
+
+    def send_email(self, form):
+        from_email = settings.DEFAULT_FROM_EMAIL
+        to_emails = settings.MANAGERS + [self.request.user.email]
+        subject = "Falta un producto - App Lupierra"
+
+        form_content = json.dumps(form.cleaned_data, cls=DjangoJSONEncoder, indent=4)
+        message = f"""Hola {self.request.user.username},
+            \nGracias por avisar de que falta un producto.
+            \nIncluimos una copia del mensaje que has enviado:
+            \n\n{form_content}
+            """
+
+        send_mail(subject, message, from_email, to_emails, fail_silently=False)
 
 
 class CustomerDeliveryNoteCurrentMonthArchiveView(CustomerAuthMixin, RedirectView):

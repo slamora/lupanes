@@ -1,0 +1,17 @@
+{% extends "lupanes/base.html" %}
+{% load django_bootstrap5 %}
+{% block main %}
+<h1>Avisar de que falta un producto en el formulario de nuevo albarán</h1>
+<div class="alert alert-primary" role="alert">
+  <p><strong>Si al intentar registrar el albarán no has encontrado el producto estás en el sitio adecuado.</strong></p>
+  <p>A través del siguiente formulario podrás avisarnos para que lo incluyamos y, además, podrás registrar la cantidad
+    que te llevas de ese producto que te llevas a casa. </p>
+  <p>¡Gracias!</p>
+</div>
+<form class="form" method="post">
+  {% csrf_token %}
+  {% bootstrap_form form %}
+  {% bootstrap_button button_type="submit" content="Enviar" %}
+</form>
+
+{% endblock %}

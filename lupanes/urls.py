@@ -6,6 +6,7 @@ app_name = "lupanes"
 
 urlpatterns = [
     path('albaran/new/', views.DeliveryNoteCreateView.as_view(), name='deliverynote-new'),
+    path('albaran/missing-product/', views.NotifyMissingProductView.as_view(), name='missing-product'),
     path('albaran/<int:pk>/edit/', views.DeliveryNoteUpdateView.as_view(), name='deliverynote-edit'),
     path('albaran/<int:pk>/delete/', views.DeliveryNoteDeleteView.as_view(), name='deliverynote-delete'),
 

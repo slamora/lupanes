@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 import datetime
+from email.utils import getaddresses
 from pathlib import Path
 
 import environ
@@ -151,7 +152,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Email configuration
 DEFAULT_FROM_EMAIL = env('DEFAULT_FROM_EMAIL', default='webmaster@localhost')
 
-EMAIL_BACKEND = 'post_office.EmailBackend'
+EMAIL_BACKEND = env('EMAIL_BACKEND', default='post_office.EmailBackend')
 
 EMAIL_HOST = env('EMAIL_HOST', default='localhost')
 
@@ -171,6 +172,10 @@ POST_OFFICE = {
     'MAX_RETRIES': 4,
     'RETRY_INTERVAL': datetime.timedelta(minutes=2),
 }
+
+ADMINS = getaddresses([env('ADMINS', default='[]',)])
+
+MANAGERS = getaddresses([env('MANAGERS', default='[]',)])
 
 # Authentication
 LOGIN_URL = 'users:login'
