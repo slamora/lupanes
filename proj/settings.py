@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 import datetime
+from email.utils import getaddresses
 from pathlib import Path
 
 import environ
@@ -24,6 +25,27 @@ env = environ.Env(
     DEBUG=(bool, False)
 )
 environ.Env.read_env(Path(BASE_DIR, '.env'))
+
+# sentry.io app monitoring platform (optional)
+if env('SENTRY_DSN', default=None):
+    import sentry_sdk
+    from sentry_sdk.integrations.django import DjangoIntegration
+
+    sentry_sdk.init(
+        dsn=env('SENTRY_DSN'),
+        integrations=[
+            DjangoIntegration(),
+        ],
+
+        # Set traces_sample_rate to 1.0 to capture 100%
+        # of transactions for performance monitoring.
+        # We recommend adjusting this value in production.
+        traces_sample_rate=0.2,
+
+        # If you wish to associate users to errors (assuming you are using
+        # django.contrib.auth) you may enable sending PII data.
+        send_default_pii=True
+    )
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
@@ -151,7 +173,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Email configuration
 DEFAULT_FROM_EMAIL = env('DEFAULT_FROM_EMAIL', default='webmaster@localhost')
 
-EMAIL_BACKEND = 'post_office.EmailBackend'
+EMAIL_BACKEND = env('EMAIL_BACKEND', default='post_office.EmailBackend')
 
 EMAIL_HOST = env('EMAIL_HOST', default='localhost')
 
@@ -160,6 +182,8 @@ EMAIL_HOST_USER = env('EMAIL_HOST_USER', default='')
 EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD', default='')
 
 EMAIL_PORT = env('EMAIL_PORT', default=25, cast=int)
+
+EMAIL_SUBJECT_PREFIX = env('EMAIL_SUBJECT_PREFIX', default='[albaranes] ')
 
 EMAIL_USE_TLS = env('EMAIL_USE_TLS', default=False, cast=bool)
 
@@ -172,9 +196,37 @@ POST_OFFICE = {
     'RETRY_INTERVAL': datetime.timedelta(minutes=2),
 }
 
+ADMINS = getaddresses([env('ADMINS', default='[]',)])
+
+MANAGERS = getaddresses([env('MANAGERS', default='[]',)])
+
 # Authentication
 LOGIN_URL = 'users:login'
 
 LOGIN_REDIRECT_URL = 'lupanes:product-list'
 
 LOGOUT_REDIRECT_URL = LOGIN_URL
+
+# Configure logging
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{asctime} [{levelname}] {module} {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose',
+        },
+    },
+    'loggers': {
+        'lupanes': {
+            'level': env('DJANGO_LOG_LEVEL', default='WARNING'),
+            'handlers': ['console'],
+        },
+    },
+}

@@ -22,6 +22,21 @@ class DeliveryNoteCreateForm(forms.ModelForm):
         return instance
 
 
+class NotifyMissingProductForm(forms.Form):
+    product = forms.CharField(
+        label="Producto",
+        help_text="Trata de ser lo más descriptivo posible. Incluye el nombre del productor."
+    )
+    quantity = forms.DecimalField(label="Cantidad")
+    unit = forms.CharField(label="Unidad")
+    comment = forms.CharField(
+        label="Comentario",
+        widget=forms.Textarea,
+        required=False,
+        help_text="¿Algo más que añadir?"
+    )
+
+
 class ProductPriceForm(forms.ModelForm):
     start_date = forms.DateField(widget=forms.SelectDateWidget())
 
