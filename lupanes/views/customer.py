@@ -1,4 +1,3 @@
-import json
 from typing import Any, Dict
 
 from django.conf import settings
@@ -6,12 +5,12 @@ from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.mail import send_mail
-from django.core.serializers.json import DjangoJSONEncoder
 from django.db.models import QuerySet
 from django.forms.models import BaseModelForm
 from django.http import (HttpRequest, HttpResponse, HttpResponseRedirect,
                          JsonResponse)
 from django.shortcuts import get_object_or_404
+from django.template.loader import render_to_string
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
 from django.utils.html import mark_safe
@@ -93,14 +92,10 @@ class NotifyMissingProductView(CustomerAuthMixin, FormView):
         from_email = settings.DEFAULT_FROM_EMAIL
         to_emails = settings.MANAGERS + [self.request.user.email]
         subject = "Falta un producto - App Lupierra"
-
-        form_content = json.dumps(form.cleaned_data, cls=DjangoJSONEncoder, indent=4)
-        message = f"""Hola {self.request.user.username},
-            \nGracias por avisar de que falta un producto.
-            \nIncluimos una copia del mensaje que has enviado:
-            \n\n{form_content}
-            """
-
+        context = {
+            "form": form,
+        }
+        message = render_to_string("emails/missing_product.txt", context=context, request=self.request)
         send_mail(subject, message, from_email, to_emails, fail_silently=False)
 
 
