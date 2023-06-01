@@ -183,3 +183,27 @@ LOGIN_URL = 'users:login'
 LOGIN_REDIRECT_URL = 'lupanes:product-list'
 
 LOGOUT_REDIRECT_URL = LOGIN_URL
+
+# Configure logging
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{asctime} [{levelname}] {module} {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose',
+        },
+    },
+    'loggers': {
+        'lupanes': {
+            'level': env('DJANGO_LOG_LEVEL', default='WARNING'),
+            'handlers': ['console'],
+        },
+    },
+}
