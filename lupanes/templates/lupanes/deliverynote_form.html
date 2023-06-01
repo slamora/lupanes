@@ -95,6 +95,10 @@
 
     {% bootstrap_field form.quantity addon_after='<span class="text-secondary" id="id_unit"></span>'%}
 
+    {% if object %}
+      <a class="btn btn-outline-secondary" href="{% url 'lupanes:deliverynote-new'  %}">Atrás</a>
+    {% endif %}
+
     {% bootstrap_button button_type="submit" content="Enviar" %}
   </form>
 </div>
