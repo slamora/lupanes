@@ -105,26 +105,46 @@
   // TODO(@slamora): move code to a .js file
   $(document).ready(function () {
     $('#id_product').select2();
+    refresh_product_component();
 
-    $("#id_product").on("change", function () {
-      if (!this.value) {
+    $("#id_product").on("change", function() {
+      console.log("HOLA");
+      console.log(this.value);
+      refresh_product_component();
+    });
+
+    function refresh_product_component() {
+      let product_id = $("#id_product").val();
+      if (!product_id) {
         return;
       }
       $.getJSON(
         // TODO(@slamora): avoid hardcoded URL
-        "/product/" + this.value + "/",
+        "/product/" + product_id + "/",
         function (data) {
           $("#id_unit").text(data["unit"]["name"]);
           $("#id_price").text(data["price"]);
 
-          let step = (data["unit"]["accept_decimals"] ? "0.001" : "1");
-          $("#id_quantity").attr("step", step);
+          let qtt = $("#id_quantity").val();
+          let step, min_value;
 
-          let min_value = (data["unit"]["accept_decimals"] ? "0.001" : "1");
+          if (data["unit"]["accept_decimals"]) {
+            step = "0.001";
+            min_value = "0.001";
+          } else {
+            step = "1";
+            min_value = "1";
+            if (qtt) {
+              qtt = Math.trunc(qtt);
+            }
+          }
+
+          $("#id_quantity").attr("step", step);
           $("#id_quantity").attr("min", min_value);
+          $("#id_quantity").val(qtt);
         },
       );
-    });
+    }
   });
 </script>
 {% endblock %}
