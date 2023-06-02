@@ -8,6 +8,10 @@ User = get_user_model()
 
 
 class DeliveryNoteCreateForm(forms.ModelForm):
+    product = forms.ModelChoiceField(
+        queryset=Product.objects.all().extra(select={'iname': 'lower(name)'}).order_by('iname')
+    )
+
     class Meta:
         model = DeliveryNote
         fields = ["product", "quantity"]

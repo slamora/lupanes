@@ -1,6 +1,7 @@
 from typing import Any, Dict
 
 from django.contrib import messages
+from django.db.models.query import QuerySet
 from django.forms.models import BaseModelForm
 from django.http import (HttpRequest, HttpResponse, HttpResponseRedirect,
                          JsonResponse)
@@ -32,6 +33,9 @@ class ProductAjaxView(CustomerAuthMixin, DetailView):
 
 class ProductListView(CustomerAuthMixin, ListView):
     model = Product
+
+    def get_queryset(self) -> QuerySet[Any]:
+        return self.model.objects.all().extra(select={'iname': 'lower(name)'}).order_by('iname')
 
 
 class ProductCreateView(ManagerAuthMixin, CreateView):
