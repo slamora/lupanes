@@ -2,7 +2,16 @@
 {% load django_bootstrap5 %}
 
 {% block main %}
-<h1>Listado de productos</h1>
+<div class="d-flex justify-content-between">
+  <h1>Listado de productos</h1>
+  <div class="">
+    {% if request.user.is_manager %}
+    <a class="btn btn-primary" href="{% url 'lupanes:product-new' %}">
+      <i class="fa-solid fa-plus"></i> Nuevo producto</a>
+    {% endif %}
+  </div>
+</div>
+
 
 <div class="table-responsive">
   <table class="table table-sm table-striped">
@@ -15,7 +24,6 @@
         <th>Precio (actual)</th>
         {% if request.user.is_manager %}
         <th>¿Activo?</th>
-        <th><!-- actions --></th>
         {% endif %}
       </tr>
     </thead>
@@ -38,7 +46,6 @@
         <td>{{ product.get_current_price }} €</td>
         {% if request.user.is_manager %}
         <td>{{ product.is_active|yesno:"Sí,No"}}</td>
-        <td>...</td>
         {% endif %}
       </tr>
       {% endif %}

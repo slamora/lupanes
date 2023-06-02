@@ -8,7 +8,7 @@ from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from django.views.generic import CreateView, DetailView, ListView, UpdateView
 
-from lupanes.forms import ProductPriceForm
+from lupanes.forms import ProductForm, ProductPriceForm
 from lupanes.models import Product
 from lupanes.users.mixins import CustomerAuthMixin, ManagerAuthMixin
 
@@ -32,6 +32,16 @@ class ProductAjaxView(CustomerAuthMixin, DetailView):
 
 class ProductListView(CustomerAuthMixin, ListView):
     model = Product
+
+
+class ProductCreateView(ManagerAuthMixin, CreateView):
+    model = Product
+    form_class = ProductForm
+    template_name = "lupanes/product_create.html"
+
+    def get_success_url(self) -> str:
+        messages.info(self.request, "Para continuar la creación del producto, introduce su precio.")
+        return reverse("lupanes:product-edit", args=(self.object.pk,))
 
 
 class ProductUpdateView(ManagerAuthMixin, UpdateView):

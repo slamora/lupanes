@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 
-from lupanes.models import DeliveryNote, ProductPrice
+from lupanes.models import DeliveryNote, Producer, Product, ProductPrice
 
 User = get_user_model()
 
@@ -35,6 +35,16 @@ class NotifyMissingProductForm(forms.Form):
         required=False,
         help_text="¿Algo más que añadir?"
     )
+
+
+class ProductForm(forms.ModelForm):
+    producer = forms.ModelChoiceField(
+        queryset=Producer.objects.all().extra(select={'iname': 'lower(name)'}).order_by('iname')
+    )
+
+    class Meta:
+        model = Product
+        fields = ["name", "unit", "producer"]
 
 
 class ProductPriceForm(forms.ModelForm):
