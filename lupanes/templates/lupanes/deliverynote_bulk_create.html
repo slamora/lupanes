@@ -1,6 +1,14 @@
 {% extends "lupanes/deliverynote_form.html" %}
 {% load django_bootstrap5 %}
 {% block main %}
+
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="{% url 'lupanes:deliverynote-current-month' %}">Albaranes</a></li>
+    <li class="breadcrumb-item active" aria-current="page">Crear albarán</li>
+  </ol>
+</nav>
+
 <div class="bg-light p-4 rounded-2 border border-secondary">
   <form class="form" method="post">
     {% csrf_token %}

@@ -66,6 +66,10 @@
                   href="{% url 'lupanes:deliverynote-current-month' %}">Albaranes</a>
                 </li>
                 <li>
+                  <a class="dropdown-item {% if url_name == 'deliverynote-new-bulk' %}active" aria-current="page"{% else %}" {% endif %}
+                  href="{% url 'lupanes:deliverynote-new-bulk' %}">Crear albarán</a>
+                </li>
+                <li>
                   <a class="dropdown-item {% if url_name == 'customer-list' %}active" aria-current="page"{% else %}" {% endif %}
                   href="{% url 'lupanes:customer-list' %}">Neveras</a>
                 </li>
