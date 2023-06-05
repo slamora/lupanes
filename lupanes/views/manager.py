@@ -1,9 +1,10 @@
 import datetime
+import urllib
 from decimal import Decimal
 from typing import Any, Dict
 
-from django.contrib.auth import get_user_model
 from django.contrib import messages
+from django.contrib.auth import get_user_model
 from django.db.models import QuerySet
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
@@ -72,6 +73,34 @@ class DeliveryNoteBulkCreateView(ManagerAuthMixin, CreateView):
     form_class = DeliveryNoteForm
     template_name = "lupanes/deliverynote_bulk_create.html"
 
+    def get_form_kwargs(self) -> Dict[str, Any]:
+        kwargs = super().get_form_kwargs()
+        # import pdb; pdb.set_trace()
+        kwargs['initial'] = {
+            'customer': self.request.GET.get("customer"),
+            'date': self.request.GET.get("date"),
+        }
+        return kwargs
+
     def get_success_url(self) -> str:
         messages.success(self.request, "Albarán creado correctamente.")
-        return reverse_lazy("lupanes:deliverynote-new-bulk")
+
+        date = self.request.POST["date"]
+        on_success = self.request.POST.get("on-success")
+        params = {}
+        if on_success == "new-same-customer":
+            params = {
+                "date": date,
+                "customer": self.request.POST["customer"]
+            }
+        elif on_success == "new-another-customer":
+            params = {
+                "date": date,
+            }
+        elif on_success == "go-back-to-list":
+            return reverse_lazy("lupanes:deliverynote-current-month")
+
+        return "{}?{}".format(
+            reverse_lazy("lupanes:deliverynote-new-bulk"),
+            urllib.parse.urlencode(params)
+        )
