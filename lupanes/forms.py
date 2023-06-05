@@ -26,6 +26,23 @@ class DeliveryNoteCreateForm(forms.ModelForm):
         return instance
 
 
+class DeliveryNoteForm(forms.ModelForm):
+    customer = forms.ModelChoiceField(
+        label="Nevera",
+        queryset=User.objects.filter(
+            groups__name="neveras").extra(select={'iusername': 'lower(username)'}).order_by('iusername'),
+    )
+    product = forms.ModelChoiceField(
+        label="Producto",
+        queryset=Product.objects.all().extra(select={'iname': 'lower(name)'}).order_by('iname')
+    )
+    date = forms.DateField(widget=forms.DateInput(attrs={"type": "date"}))
+
+    class Meta:
+        model = DeliveryNote
+        fields = ["customer", "product", "quantity", "date"]
+
+
 class NotifyMissingProductForm(forms.Form):
     product = forms.CharField(
         label="Producto",

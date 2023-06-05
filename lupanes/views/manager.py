@@ -3,12 +3,14 @@ from decimal import Decimal
 from typing import Any, Dict
 
 from django.contrib.auth import get_user_model
+from django.contrib import messages
 from django.db.models import QuerySet
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 from django.utils import timezone
-from django.views.generic import ListView, RedirectView
+from django.views.generic import CreateView, ListView, RedirectView
 from django.views.generic.dates import MonthArchiveView, MonthMixin, YearMixin
 
+from lupanes.forms import DeliveryNoteForm
 from lupanes.models import DeliveryNote
 from lupanes.users.mixins import ManagerAuthMixin
 
@@ -64,3 +66,12 @@ class DeliveryNoteSummaryView(ManagerAuthMixin, YearMixin, MonthMixin, ListView)
         context = super().get_context_data(**kwargs)
         context["period"] = self.period
         return context
+
+
+class DeliveryNoteBulkCreateView(ManagerAuthMixin, CreateView):
+    form_class = DeliveryNoteForm
+    template_name = "lupanes/deliverynote_bulk_create.html"
+
+    def get_success_url(self) -> str:
+        messages.success(self.request, "Albarán creado correctamente.")
+        return reverse_lazy("lupanes:deliverynote-new-bulk")

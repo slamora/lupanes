@@ -20,6 +20,7 @@ urlpatterns = [
          name='deliverynote-month'),
     path('albaranes/<int:year>/<int:month>/summary/', views.DeliveryNoteSummaryView.as_view(month_format="%m"),
          name='deliverynote-summary'),
+    path('albaranes/new-bulk/', views.DeliveryNoteBulkCreateView.as_view(), name='deliverynote-new-bulk'),
 
     path('neveras/', views.CustomerListView.as_view(), name='customer-list'),
 
