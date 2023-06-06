@@ -3,19 +3,48 @@
 
 {% block login_content %}
 <div>
-    <form action="{% url 'users:login' %}" role="form" method="post">
-        {% csrf_token %}
-        <input type="hidden" name="next" value="{{ next }}" />
-        {% bootstrap_form form layout="vertical" %}
+  <form action="{% url 'users:login' %}" role="form" method="post">
+    {% csrf_token %}
+    {% bootstrap_field form.username %}
+    {% bootstrap_field form.password addon_after='<i id="id_password_toggle" class="fa-regular fa-eye"></i>' %}
 
-        <div><a href="{% url 'users:password_reset' %}">{% trans "Have you forgot the password?" %}</a></div>
-        <div class="form-actions-no-box">
-            <input type="submit" name="submit" value="{% trans 'Log in' %}" class="btn btn-primary form-control"
-                id="submit-id-submit">
-        </div>
-    </form>
+    <input type="hidden" name="next" value="{{ next }}" />
+
+    <div class="mb-3"><a href="{% url 'users:password_reset' %}">¿Has olvidado tu contraseña?</a></div>
+    <div class="form-actions-no-box">
+      <input type="submit" name="submit" value="{% trans 'Log in' %}" class="btn btn-primary form-control"
+        id="submit-id-submit">
+    </div>
+  </form>
 </div>
-<div class="row-fluid mt-3 pt-3 border-top border-dark text-center">
-  <p>Tu nombre de usuario es el nombre de tu nevera</p>
+<div class="row-fluid mt-3 pt-3 border-top border-dark text-start">
+  <p>Tu nombre de usuario es el <strong>nombre de tu nevera</strong>.
+    Puedes consultarlo en la sección <a
+      href="https://lupierra.wordpress.com/informacion-para-socios/saldo-socios/">Información para socios</a> disponible
+    en <a href="http://lupierra.es">lupierra.es</a></p>
 </div><!-- /.row-fluid -->
+
+<script>
+  (function () {
+
+    let toggle = document.querySelector('#id_password_toggle');
+
+    toggle.addEventListener('click', function (e) {
+      e.preventDefault();
+
+
+      let x = document.getElementById("id_password");
+      if (x.type === "password") {
+        x.type = "text";
+
+      } else {
+        x.type = "password";
+      }
+      toggle.classList.toggle('fa-eye');
+      toggle.classList.toggle('fa-eye-slash');
+    });
+
+  })();
+</script>
+
 {% endblock login_content %}
