@@ -203,7 +203,7 @@ MANAGERS = getaddresses([env('MANAGERS', default='[]',)])
 # Authentication
 LOGIN_URL = 'users:login'
 
-LOGIN_REDIRECT_URL = 'lupanes:product-list'
+LOGIN_REDIRECT_URL = 'users:customer-profile'
 
 LOGOUT_REDIRECT_URL = LOGIN_URL
 
