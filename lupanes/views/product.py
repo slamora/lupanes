@@ -50,7 +50,7 @@ class ProductCreateView(ManagerAuthMixin, CreateView):
 
 class ProductUpdateView(ManagerAuthMixin, UpdateView):
     model = Product
-    fields = ["name"]
+    form_class = ProductForm
 
     def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
         context = super().get_context_data(**kwargs)

@@ -8,8 +8,10 @@ User = get_user_model()
 
 
 class DeliveryNoteCreateForm(forms.ModelForm):
+    """Form to register day shop by neveras"""
     product = forms.ModelChoiceField(
-        queryset=Product.objects.all().extra(select={'iname': 'lower(name)'}).order_by('iname')
+        label="Producto",
+        queryset=Product.objects.filter(is_active=True).extra(select={'iname': 'lower(name)'}).order_by('iname')
     )
 
     class Meta:
@@ -27,11 +29,13 @@ class DeliveryNoteCreateForm(forms.ModelForm):
 
 
 class DeliveryNoteForm(forms.ModelForm):
+    """Form to digitalize albaranes by tienda group"""
     customer = forms.ModelChoiceField(
         label="Nevera",
         queryset=User.objects.filter(
             groups__name="neveras").extra(select={'iusername': 'lower(username)'}).order_by('iusername'),
     )
+    # allow to select all products (even inactive)
     product = forms.ModelChoiceField(
         label="Producto",
         queryset=Product.objects.all().extra(select={'iname': 'lower(name)'}).order_by('iname')
@@ -62,10 +66,12 @@ class ProductForm(forms.ModelForm):
     producer = forms.ModelChoiceField(
         queryset=Producer.objects.all().extra(select={'iname': 'lower(name)'}).order_by('iname')
     )
+    is_active = forms.BooleanField(
+        label="¿Activo?", help_text="En lugar de eliminar un producto, márcalo como inactivo.")
 
     class Meta:
         model = Product
-        fields = ["name", "unit", "producer"]
+        fields = ["name", "unit", "producer", "is_active"]
 
 
 class ProductPriceForm(forms.ModelForm):
