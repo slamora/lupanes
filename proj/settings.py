@@ -15,6 +15,7 @@ from email.utils import getaddresses
 from pathlib import Path
 
 import environ
+from django.utils.crypto import get_random_string
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -230,3 +231,7 @@ LOGGING = {
         },
     },
 }
+
+
+# Lupierra custom settings
+LUPIERRA_BASIC_AUTH_PASS = env("LUPIERRA_BASIC_AUTH_PASS", default=get_random_string(16))

@@ -38,4 +38,6 @@ urlpatterns = [
     path('auth/profile/', views.CustomerProfileView.as_view(), name='customer-profile'),
 
     path('neveras/new/', views.CustomerCreateView.as_view(), name='customer-new'),
+
+    path('info/neveras/', views.CustomerListView.as_view(), name='info-customer-list'),
 ]
