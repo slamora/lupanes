@@ -46,6 +46,15 @@ class DeliveryNoteForm(forms.ModelForm):
         model = DeliveryNote
         fields = ["customer", "product", "quantity", "date"]
 
+    def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop("user")
+        return super().__init__(*args, **kwargs)
+
+    def save(self, commit=True):
+        self.instance.created_by = self.user
+        instance = super().save(commit)
+        return instance
+
 
 class NotifyMissingProductForm(forms.Form):
     product = forms.CharField(

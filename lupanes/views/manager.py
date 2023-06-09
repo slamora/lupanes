@@ -75,11 +75,11 @@ class DeliveryNoteBulkCreateView(ManagerAuthMixin, CreateView):
 
     def get_form_kwargs(self) -> Dict[str, Any]:
         kwargs = super().get_form_kwargs()
-        # import pdb; pdb.set_trace()
         kwargs['initial'] = {
             'customer': self.request.GET.get("customer"),
             'date': self.request.GET.get("date"),
         }
+        kwargs['user'] = self.request.user
         return kwargs
 
     def get_success_url(self) -> str:
