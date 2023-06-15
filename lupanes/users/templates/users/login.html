@@ -11,7 +11,8 @@
     <div class="mb-3">
       <label class="form-label" for="id_username">Nombre de usuario</label>
       <input type="text" name="username" autofocus="" autocapitalize="none" autocomplete="username" maxlength="150"
-        class="form-control {% if form.errors %}is-invalid{% endif %}" placeholder="Nombre de usuario" required="" id="id_username">
+        class="form-control {% if form.errors %}is-invalid{% endif %}" placeholder="Nombre de usuario" required="" id="id_username"
+        value="{{ form.username.value|default:"" }}">
     </div>
 
     <div class="mb-3">
