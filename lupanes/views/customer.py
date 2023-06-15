@@ -3,6 +3,7 @@ from typing import Any, Dict
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import get_user_model
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.mail import mail_managers, send_mail
 from django.db.models import QuerySet
 from django.forms.models import BaseModelForm
@@ -12,7 +13,7 @@ from django.urls import reverse, reverse_lazy
 from django.utils import timezone
 from django.utils.html import mark_safe
 from django.utils.translation import gettext as _
-from django.views.generic import FormView, RedirectView
+from django.views.generic import FormView, RedirectView, TemplateView
 from django.views.generic.dates import MonthArchiveView
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
 
@@ -21,6 +22,10 @@ from lupanes.models import DeliveryNote
 from lupanes.users.mixins import CustomerAuthMixin
 
 User = get_user_model()
+
+
+class DashboardView(LoginRequiredMixin, TemplateView):
+    template_name = "lupanes/dashboard.html"
 
 
 class DeliveryNoteCreateView(CustomerAuthMixin, CreateView):

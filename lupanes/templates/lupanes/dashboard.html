@@ -1,0 +1,32 @@
+{% extends "lupanes/base.html" %}
+{% load django_bootstrap5 %}
+
+{% block main %}
+<h1>Bienvenido/a {{ request.user.username }}</h1>
+
+<h2>¿Qué quieres hacer?</h2>
+
+{% if request.user.is_customer %}
+<div class="d-grid gap-2 col-lg-4">
+  <a class="btn btn-lg btn-outline-success" href="{% url 'lupanes:deliverynote-new' %}">
+    <i class="fa-solid fa-plus"></i> Apuntar mi compra (albarán)</a>
+  <a class="btn btn-lg btn-outline-secondary" href="{% url 'lupanes:deliverynote-current-month-customer' %}">
+    <i class="fa-solid fa-list"></i> Consultar mis albaranes</a>
+  <a class="btn btn-lg btn-outline-warning" href="{% url 'lupanes:product-list' %}">
+    <i class="fa-solid fa-euro-sign"></i> Consultar el listado de precios</a>
+</div>
+
+{% elif request.user.is_manager %}
+<h3>Tareas de gestión</h3>
+<div class="d-grid gap-2 col-lg-4">
+  <a class="btn btn-lg btn-outline-success" href="{% url 'lupanes:deliverynote-new-bulk' %}">
+    <i class="fa-solid fa-plus"></i> Crear un albarán</a>
+  <a class="btn btn-lg btn-outline-secondary" href="{% url 'lupanes:deliverynote-current-month' %}">
+    <i class="fa-solid fa-list"></i> Consultar el listado de albaranes</a>
+  <a class="btn btn-lg btn-outline-warning" href="{% url 'lupanes:product-list' %}">
+    <i class="fa-solid fa-euro-sign"></i> Gestionar los productos y precios</a>
+  <a class="btn btn-lg btn-outline-primary" href="{% url 'lupanes:customer-list' %}">
+    <i class="fa-solid fa-users"></i> Gestionar las neveras</a>
+</div>
+{% endif %}
+{% endblock main %}

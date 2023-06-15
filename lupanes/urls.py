@@ -5,6 +5,8 @@ from lupanes import views
 app_name = "lupanes"
 
 urlpatterns = [
+    path('dashboard/', views.DashboardView.as_view(), name='dashboard'),
+
     path('albaran/new/', views.DeliveryNoteCreateView.as_view(), name='deliverynote-new'),
     path('albaran/missing-product/', views.NotifyMissingProductView.as_view(), name='missing-product'),
     path('albaran/<int:pk>/edit/', views.DeliveryNoteUpdateView.as_view(), name='deliverynote-edit'),
