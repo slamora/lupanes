@@ -1,6 +1,7 @@
 from typing import Any, Dict
 
 from django.contrib import messages
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models.query import QuerySet
 from django.forms.models import BaseModelForm
 from django.http import (HttpRequest, HttpResponse, HttpResponseRedirect,
@@ -31,7 +32,7 @@ class ProductAjaxView(CustomerAuthMixin, DetailView):
         return JsonResponse(data=data)
 
 
-class ProductListView(CustomerAuthMixin, ListView):
+class ProductListView(LoginRequiredMixin, ListView):
     model = Product
 
     def get_queryset(self) -> QuerySet[Any]:
