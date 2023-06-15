@@ -3,10 +3,25 @@
 
 {% block login_content %}
 <div>
+  {% bootstrap_form_errors form %}
   <form action="{% url 'users:login' %}" role="form" method="post">
     {% csrf_token %}
-    {% bootstrap_field form.username %}
-    {% bootstrap_field form.password addon_after='<i id="id_password_toggle" class="fa-regular fa-eye"></i>' %}
+
+
+    <div class="mb-3">
+      <label class="form-label" for="id_username">Nombre de usuario</label>
+      <input type="text" name="username" autofocus="" autocapitalize="none" autocomplete="username" maxlength="150"
+        class="form-control {% if form.errors %}is-invalid{% endif %}" placeholder="Nombre de usuario" required="" id="id_username">
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label" for="id_password">Contraseña</label>
+      <div class="input-group">
+        <input type="password" name="password" autocomplete="current-password" class="form-control {% if form.errors %}is-invalid{% endif %}"
+          placeholder="Contraseña" required="" id="id_password">
+        <span class="input-group-text"><i id="id_password_toggle" class="fa-regular fa-eye"></i></span>
+      </div>
+    </div>
 
     <input type="hidden" name="next" value="{{ next }}" />
 
@@ -19,8 +34,8 @@
 </div>
 <div class="row-fluid mt-3 pt-3 border-top border-dark text-start">
   <p>Tu nombre de usuario es el <strong>nombre de tu nevera</strong>.
-    Si tienes dudas puedes consultarlo en la sección <a
-      href="{% url 'users:info-customer-list' %}">Información para socios</a></p>
+    Si tienes dudas puedes consultarlo en la sección <a href="{% url 'users:info-customer-list' %}">Información para
+      socios</a></p>
 </div><!-- /.row-fluid -->
 
 <script>
