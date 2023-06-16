@@ -32,8 +32,7 @@ class DeliveryNoteForm(forms.ModelForm):
     """Form to digitalize albaranes by tienda group"""
     customer = forms.ModelChoiceField(
         label="Nevera",
-        queryset=User.objects.filter(
-            groups__name="neveras").extra(select={'iusername': 'lower(username)'}).order_by('iusername'),
+        queryset=User.objects.get_active_customers(),
     )
     # allow to select all products (even inactive)
     product = forms.ModelChoiceField(
