@@ -4,7 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
-## 0.1.0
+## 0.1.1 - 2023-06-16
+- [fixed] Regenerate users initial migration (changed user manager).
+
+## 0.1.0 - 2023-06-16
 First release! Created basic features to manage delivery notes:
 - [added] Users login and permission system (based on `neveras` and `tienda` groups).
 - [added] Register, update and delete new delivery notes.
