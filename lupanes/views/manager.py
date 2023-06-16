@@ -24,7 +24,7 @@ class CustomerListView(ManagerAuthMixin, ListView):
     model = User
 
     def get_queryset(self) -> QuerySet[User]:
-        return User.objects.filter(is_active=True, groups__name="neveras")
+        return self.model.objects.get_active_customers()
 
 
 class DeliveryNoteCurrentMonthArchiveView(ManagerAuthMixin, RedirectView):
@@ -51,7 +51,7 @@ class DeliveryNoteSummaryView(ManagerAuthMixin, YearMixin, MonthMixin, ListView)
         month = self.kwargs["month"]
         self.period = datetime.datetime(year=year, month=month, day=1)
 
-        qs = User.objects.filter(is_active=True)
+        qs = User.objects.get_active_customers()
         for customer in qs:
             customer.total = Decimal(0)
             notes = customer.deliverynote_set.filter(

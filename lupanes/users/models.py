@@ -1,9 +1,15 @@
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.db import models
+from django.db.models.functions import Lower
 from django.utils.translation import gettext_lazy as _
 
-from lupanes.users.validators import CustomUnicodeUsernameValidator
 from lupanes.users import CUSTOMERS_GROUP, MANAGERS_GROUP
+from lupanes.users.validators import CustomUnicodeUsernameValidator
+
+
+class UserManager(BaseUserManager):
+    def get_active_customers(self):
+        return self.filter(is_active=True, groups__name="neveras").order_by(Lower('username'))
 
 
 class User(AbstractUser):
@@ -28,6 +34,8 @@ class User(AbstractUser):
             "unique": _("A user with that username already exists."),
         },
     )
+
+    objects = UserManager()
 
     @property
     def is_customer(self):

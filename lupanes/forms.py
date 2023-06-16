@@ -3,6 +3,7 @@ from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 
 from lupanes.models import DeliveryNote, Producer, Product, ProductPrice
+from django.db.models.functions import Lower
 
 User = get_user_model()
 
@@ -11,7 +12,7 @@ class DeliveryNoteCreateForm(forms.ModelForm):
     """Form to register day shop by neveras"""
     product = forms.ModelChoiceField(
         label="Producto",
-        queryset=Product.objects.filter(is_active=True).extra(select={'iname': 'lower(name)'}).order_by('iname')
+        queryset=Product.objects.filter(is_active=True).order_by(Lower('name'))
     )
 
     class Meta:
@@ -32,13 +33,12 @@ class DeliveryNoteForm(forms.ModelForm):
     """Form to digitalize albaranes by tienda group"""
     customer = forms.ModelChoiceField(
         label="Nevera",
-        queryset=User.objects.filter(
-            groups__name="neveras").extra(select={'iusername': 'lower(username)'}).order_by('iusername'),
+        queryset=User.objects.get_active_customers(),
     )
     # allow to select all products (even inactive)
     product = forms.ModelChoiceField(
         label="Producto",
-        queryset=Product.objects.all().extra(select={'iname': 'lower(name)'}).order_by('iname')
+        queryset=Product.objects.all().order_by(Lower('name'))
     )
     date = forms.DateField(widget=forms.DateInput(attrs={"type": "date"}))
 
@@ -73,7 +73,7 @@ class NotifyMissingProductForm(forms.Form):
 
 class ProductForm(forms.ModelForm):
     producer = forms.ModelChoiceField(
-        queryset=Producer.objects.all().extra(select={'iname': 'lower(name)'}).order_by('iname')
+        queryset=Producer.objects.all().order_by(Lower('name'))
     )
     is_active = forms.BooleanField(
         label="¿Activo?", help_text="En lugar de eliminar un producto, márcalo como inactivo.")
