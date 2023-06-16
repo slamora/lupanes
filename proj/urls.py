@@ -22,5 +22,7 @@ urlpatterns = [
     path('turberes/', admin.site.urls),
     path('', include('lupanes.urls')),
     path('', include('lupanes.users.urls')),
-    path('', RedirectView.as_view(pattern_name='users:login', permanent=True), name='root_index'),
+    path('', RedirectView.as_view(pattern_name='lupanes:dashboard', permanent=True), name='root_index'),
+    path('report-issue/', RedirectView.as_view(url='https://forms.gle/E4taAb3Xva2rfbKR9', permanent=True),
+         name='report-issue')
 ]
