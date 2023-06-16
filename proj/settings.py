@@ -15,6 +15,7 @@ from email.utils import getaddresses
 from pathlib import Path
 
 import environ
+from django.utils.crypto import get_random_string
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -98,6 +99,8 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                # Our context processor:
+                "proj.context_processors.metadata",
             ],
         },
     },
@@ -146,6 +149,9 @@ TIME_ZONE = 'Europe/Madrid'
 USE_I18N = True
 
 USE_TZ = True
+
+# NOTE WARNING: on Django 3.2 USE_L10N is False by default but since 4.0 default is True
+USE_L10N = True
 
 
 # Static files (CSS, JavaScript, Images)
@@ -203,7 +209,7 @@ MANAGERS = getaddresses([env('MANAGERS', default='[]',)])
 # Authentication
 LOGIN_URL = 'users:login'
 
-LOGIN_REDIRECT_URL = 'lupanes:product-list'
+LOGIN_REDIRECT_URL = 'lupanes:dashboard'
 
 LOGOUT_REDIRECT_URL = LOGIN_URL
 
@@ -230,3 +236,7 @@ LOGGING = {
         },
     },
 }
+
+
+# Lupierra custom settings
+LUPIERRA_BASIC_AUTH_PASS = env("LUPIERRA_BASIC_AUTH_PASS", default=get_random_string(16))

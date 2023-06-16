@@ -6,7 +6,11 @@ from django.utils import timezone
 class DeliveryNote(models.Model):
     """Albarán"""
     customer = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
-    date = models.DateTimeField(auto_now_add=True)
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, on_delete=models.SET_NULL,
+                                   related_name="registered_notes")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    date = models.DateTimeField(default=timezone.now)
     product = models.ForeignKey("Product", on_delete=models.PROTECT)
     quantity = models.DecimalField("Cantidad", max_digits=6, decimal_places=3)
 

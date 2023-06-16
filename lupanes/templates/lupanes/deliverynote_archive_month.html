@@ -25,8 +25,9 @@
 </ul>
 
 <div class="mb-3">
-  <a class="btn btn-outline-success" href="{% url 'lupanes:deliverynote-summary' month.year month.month %}">Ver resumen
+  <a class="btn btn-outline-success me-2" href="{% url 'lupanes:deliverynote-summary' month.year month.month %}">Ver resumen
     del mes por neveras</a>
+  <a class="btn btn-primary" href="{% url 'lupanes:deliverynote-new-bulk' %}">Crear albarán</a>
 </div>
 
 <div class="table-responsive">
@@ -46,7 +47,9 @@
       <tr>
         <td>{{ forloop.counter }}</td>
         <td>{{ note.date|date:"SHORT_DATE_FORMAT" }}</td>
-        <td>{{ note.customer.username }}</td>
+        <td>{{ note.customer.username }}
+          {% if note.created_by %}<i class="fa-regular fa-file-lines text-warning" title="Registrado por {{ note.created_by.username }}"></i>{% endif %}
+        </td>
         <td>{{ note.product.name }}</td>
         <td class="text-nowrap">
           {% if note.product.unit_accept_decimals %}{{ note.quantity }}

@@ -39,7 +39,9 @@
       <tr>
         <td>{{ forloop.counter }}</td>
         <td>{{ note.date|date:"SHORT_DATE_FORMAT" }}</td>
-        <td>{{ note.customer.username }}</td>
+        <td>{{ note.customer.username }}
+          {% if note.created_by %}<i class="fa-regular fa-file-lines text-warning" title="Registrado por {{ note.created_by.username }}"></i>{% endif %}
+        </td>
         <td>{{ note.product.name }}</td>
         <td class="text-nowrap">
           {% if note.product.unit_accept_decimals %}{{ note.quantity }}

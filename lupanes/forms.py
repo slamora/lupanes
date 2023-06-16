@@ -2,12 +2,18 @@ from django import forms
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 
-from lupanes.models import DeliveryNote, ProductPrice
+from lupanes.models import DeliveryNote, Producer, Product, ProductPrice
 
 User = get_user_model()
 
 
 class DeliveryNoteCreateForm(forms.ModelForm):
+    """Form to register day shop by neveras"""
+    product = forms.ModelChoiceField(
+        label="Producto",
+        queryset=Product.objects.filter(is_active=True).extra(select={'iname': 'lower(name)'}).order_by('iname')
+    )
+
     class Meta:
         model = DeliveryNote
         fields = ["product", "quantity"]
@@ -18,6 +24,34 @@ class DeliveryNoteCreateForm(forms.ModelForm):
 
     def save(self, commit=True):
         self.instance.customer = self.customer
+        instance = super().save(commit)
+        return instance
+
+
+class DeliveryNoteForm(forms.ModelForm):
+    """Form to digitalize albaranes by tienda group"""
+    customer = forms.ModelChoiceField(
+        label="Nevera",
+        queryset=User.objects.filter(
+            groups__name="neveras").extra(select={'iusername': 'lower(username)'}).order_by('iusername'),
+    )
+    # allow to select all products (even inactive)
+    product = forms.ModelChoiceField(
+        label="Producto",
+        queryset=Product.objects.all().extra(select={'iname': 'lower(name)'}).order_by('iname')
+    )
+    date = forms.DateField(widget=forms.DateInput(attrs={"type": "date"}))
+
+    class Meta:
+        model = DeliveryNote
+        fields = ["customer", "product", "quantity", "date"]
+
+    def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop("user")
+        return super().__init__(*args, **kwargs)
+
+    def save(self, commit=True):
+        self.instance.created_by = self.user
         instance = super().save(commit)
         return instance
 
@@ -35,6 +69,18 @@ class NotifyMissingProductForm(forms.Form):
         required=False,
         help_text="¿Algo más que añadir?"
     )
+
+
+class ProductForm(forms.ModelForm):
+    producer = forms.ModelChoiceField(
+        queryset=Producer.objects.all().extra(select={'iname': 'lower(name)'}).order_by('iname')
+    )
+    is_active = forms.BooleanField(
+        label="¿Activo?", help_text="En lugar de eliminar un producto, márcalo como inactivo.")
+
+    class Meta:
+        model = Product
+        fields = ["name", "unit", "producer", "is_active"]
 
 
 class ProductPriceForm(forms.ModelForm):
