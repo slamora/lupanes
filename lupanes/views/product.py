@@ -2,6 +2,7 @@ from typing import Any, Dict
 
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db.models.functions import Lower
 from django.db.models.query import QuerySet
 from django.forms.models import BaseModelForm
 from django.http import (HttpRequest, HttpResponse, HttpResponseRedirect,
@@ -36,7 +37,7 @@ class ProductListView(LoginRequiredMixin, ListView):
     model = Product
 
     def get_queryset(self) -> QuerySet[Any]:
-        return self.model.objects.all().extra(select={'iname': 'lower(name)'}).order_by('iname')
+        return self.model.objects.all().order_by(Lower('name'))
 
 
 class ProductCreateView(ManagerAuthMixin, CreateView):
