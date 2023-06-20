@@ -76,7 +76,7 @@ class ProductForm(forms.ModelForm):
         queryset=Producer.objects.all().order_by(Lower('name'))
     )
     is_active = forms.BooleanField(
-        label="¿Activo?", help_text="En lugar de eliminar un producto, márcalo como inactivo.")
+        label="¿Activo?", help_text="En lugar de eliminar un producto, márcalo como inactivo.", required=False)
 
     class Meta:
         model = Product
