@@ -1,4 +1,4 @@
-from django.contrib.auth.models import AbstractUser, BaseUserManager
+from django.contrib.auth.models import AbstractUser, UserManager as ContribUserManager
 from django.db import models
 from django.db.models.functions import Lower
 from django.utils.translation import gettext_lazy as _
@@ -7,7 +7,7 @@ from lupanes.users import CUSTOMERS_GROUP, MANAGERS_GROUP
 from lupanes.users.validators import CustomUnicodeUsernameValidator
 
 
-class UserManager(BaseUserManager):
+class UserManager(ContribUserManager):
     def get_active_customers(self):
         return self.filter(is_active=True, groups__name="neveras").order_by(Lower('username'))
 
