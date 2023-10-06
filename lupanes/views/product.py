@@ -60,6 +60,7 @@ class ProductUpdateView(ManagerAuthMixin, UpdateView):
         return context
 
     def get_success_url(self) -> str:
+        messages.success(self.request, "Producto actualizado correctamente.")
         return reverse("lupanes:product-edit", args=(self.kwargs["pk"],))
 
 

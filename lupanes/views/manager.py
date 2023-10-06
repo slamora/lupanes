@@ -8,7 +8,8 @@ from django.contrib.auth import get_user_model
 from django.db.models import QuerySet
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
-from django.views.generic import CreateView, ListView, RedirectView
+from django.utils.formats import date_format
+from django.views.generic import CreateView, DeleteView, ListView, RedirectView, UpdateView
 from django.views.generic.dates import MonthArchiveView, MonthMixin, YearMixin
 
 from lupanes.forms import DeliveryNoteForm
@@ -104,3 +105,33 @@ class DeliveryNoteBulkCreateView(ManagerAuthMixin, CreateView):
             reverse_lazy("lupanes:deliverynote-new-bulk"),
             urllib.parse.urlencode(params)
         )
+
+
+class DeliveryNoteBulkUpdateView(ManagerAuthMixin, UpdateView):
+    form_class = DeliveryNoteForm
+    template_name = "lupanes/deliverynote_bulk_create.html"
+    model = DeliveryNote
+
+    def get_form_kwargs(self) -> Dict[str, Any]:
+        kwargs = super().get_form_kwargs()
+        kwargs['user'] = self.request.user
+        return kwargs
+
+    def get_success_url(self) -> str:
+        date = self.object.date
+        note_date = date_format(date, format='SHORT_DATE_FORMAT', use_l10n=True)
+        msg = (f"Albarán con fecha { note_date } de { self.object.customer.username } "
+               f"y producto {self.object.product.name} actualizado correctamente.")
+        messages.info(self.request, msg)
+
+        return reverse_lazy("lupanes:deliverynote-month", args=(date.year, date.month))
+
+
+class DeliveryNoteBulkDeleteView(ManagerAuthMixin, DeleteView):
+    model = DeliveryNote
+    template_name = "lupanes/deliverynote_bulk_confirm_delete.html"
+
+    def get_success_url(self) -> str:
+        date = self.object.date
+        messages.info(self.request, "Albarán borrado correctamente.")
+        return reverse_lazy("lupanes:deliverynote-month", args=(date.year, date.month))

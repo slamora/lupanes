@@ -5,6 +5,8 @@ from lupanes.views.customer import (
     NotifyMissingProductView)
 from lupanes.views.manager import (CustomerListView,
                                    DeliveryNoteBulkCreateView,
+                                   DeliveryNoteBulkUpdateView,
+                                   DeliveryNoteBulkDeleteView,
                                    DeliveryNoteCurrentMonthArchiveView,
                                    DeliveryNoteMonthArchiveView,
                                    DeliveryNoteSummaryView)
@@ -15,6 +17,8 @@ from lupanes.views.product import (ProductAjaxView, ProductCreateView,
 __all__ = [
     "DashboardView",
     "DeliveryNoteBulkCreateView",
+    "DeliveryNoteBulkUpdateView",
+    "DeliveryNoteBulkDeleteView",
     "CustomerDeliveryNoteCurrentMonthArchiveView",
     "CustomerDeliveryNoteMonthArchiveView",
     "CustomerListView",
