@@ -5,7 +5,11 @@
 <nav aria-label="breadcrumb">
   <ol class="breadcrumb">
     <li class="breadcrumb-item"><a href="{% url 'lupanes:deliverynote-current-month' %}">Albaranes</a></li>
+    {% if object.pk %}
+    <li class="breadcrumb-item active" aria-current="page">Editar albarán</li>
+    {% else %}
     <li class="breadcrumb-item active" aria-current="page">Crear albarán</li>
+    {% endif %}
   </ol>
 </nav>
 
@@ -22,8 +26,10 @@
 
     {% bootstrap_field form.date %}
 
-    {% bootstrap_button button_type="submit" name="on-success" value="new-same-customer" content="Guardar y continuar con la misma nevera"  %}
-    {% bootstrap_button button_type="submit" name="on-success" value="new-another-customer" content="Guardar y cambiar de nevera" %}
+    {% if not object.pk %}
+      {% bootstrap_button button_type="submit" name="on-success" value="new-same-customer" content="Guardar y continuar con la misma nevera"  %}
+      {% bootstrap_button button_type="submit" name="on-success" value="new-another-customer" content="Guardar y cambiar de nevera" %}
+    {% endif %}
     {% bootstrap_button button_type="submit" name="on-success" value="go-back-to-list" content="Guardar y volver al listado" %}
   </form>
 
