@@ -9,7 +9,7 @@ from django.db.models import QuerySet
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
 from django.utils.formats import date_format
-from django.views.generic import CreateView, ListView, RedirectView, UpdateView
+from django.views.generic import CreateView, DeleteView, ListView, RedirectView, UpdateView
 from django.views.generic.dates import MonthArchiveView, MonthMixin, YearMixin
 
 from lupanes.forms import DeliveryNoteForm
@@ -124,4 +124,14 @@ class DeliveryNoteBulkUpdateView(ManagerAuthMixin, UpdateView):
                f"y producto {self.object.product.name} actualizado correctamente.")
         messages.info(self.request, msg)
 
+        return reverse_lazy("lupanes:deliverynote-month", args=(date.year, date.month))
+
+
+class DeliveryNoteBulkDeleteView(ManagerAuthMixin, DeleteView):
+    model = DeliveryNote
+    template_name = "lupanes/deliverynote_bulk_confirm_delete.html"
+
+    def get_success_url(self) -> str:
+        date = self.object.date
+        messages.info(self.request, "Albarán borrado correctamente.")
         return reverse_lazy("lupanes:deliverynote-month", args=(date.year, date.month))

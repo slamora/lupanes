@@ -1,0 +1,18 @@
+{% extends "lupanes/base.html" %}
+{% load django_bootstrap5 %}
+
+{% block main %}
+
+<h1>Confirmación de borrado</h1>
+<p>
+  ¿Estás seguro de que quieres borrar este albarán?<br>
+  <pre>{{ object.date|date:"SHORT_DATE_FORMAT" }} | {{ object.customer.username }} | {{ object.product.name }} | {{ object.quantity }} {{ object.product.unit }}</pre>
+</p>
+
+<form method="post">
+  {% csrf_token %}
+  <a class="btn btn-outline-secondary" href="{% url 'lupanes:deliverynote-month' object.date.year object.date.month %}">Atrás</a>
+  <button type="submit" class="btn btn-danger">Borrar</button>
+</form>
+
+{% endblock main %}
