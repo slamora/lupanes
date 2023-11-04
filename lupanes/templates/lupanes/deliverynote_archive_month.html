@@ -1,6 +1,14 @@
 {% extends "lupanes/base.html" %}
 {% load django_bootstrap5 %}
 
+{% block extra_style %}
+<style>
+  #deliverynote-archive-month .amount::after {
+    content: " €";
+  }
+</style>
+{% endblock %}
+
 {% block main %}
 <h1>Listado de albaranes</h1>
 
@@ -32,7 +40,8 @@
 </div>
 
 <div class="table-responsive">
-  <table class="table table-sm table-striped">
+  <table id="deliverynote-archive-month" class="table table-sm table-striped"
+    data-export-options='{"fileName": "albaranes-{{ period|date:"F Y" }}"}'>
     <thead>
       <tr>
         <th>#</th>
@@ -59,7 +68,7 @@
           {% else %}{{ note.quantity|floatformat:0 }}{% endif %}
           {{ note.product.unit }}
         </td>
-        <td>{{ note.amount|floatformat:2 }} €</td>
+        <td>{{ note.get_amount_export_format }}</td>
         <td>
           <a class="btn btn-outline-warning" href="{% url 'lupanes:deliverynote-edit-bulk' note.pk %}">
             <i class="fa-solid fa-pencil" title="editar albarán" aria-hidden="true"></i></a>
@@ -72,3 +81,17 @@
   </table>
 </div>
 {% endblock main %}
+
+{% block extra_script %}
+<script>
+  $(document).ready(function () {
+    $('#deliverynote-archive-month').DataTable({
+      dom: 'Bfrtip',
+      buttons: [
+        'copy', 'csv', 'excel', 'pdf', 'print'
+      ],
+      paging: false,
+    });
+  });
+</script>
+{% endblock %}

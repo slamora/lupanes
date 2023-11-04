@@ -62,6 +62,8 @@ class DeliveryNoteSummaryView(ManagerAuthMixin, YearMixin, MonthMixin, ListView)
             for note in notes:
                 customer.total += note.amount()
 
+            customer.total_export_format = '{0:.2f}'.format(customer.total)
+
         return qs
 
     def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:

@@ -33,7 +33,7 @@
       <tr>
         <td>{{ forloop.counter }}</td>
         <td>{{ customer.username }}</td>
-        <td class="amount">{{ customer.total|floatformat:2 }}</td>
+        <td class="amount">{{ customer.total_export_format }}</td>
       </tr>
       {% endfor %}
     </tbody>

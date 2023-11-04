@@ -17,6 +17,9 @@ class DeliveryNote(models.Model):
     def amount(self):
         return self.quantity * self.product.get_price_on(self.date)
 
+    def get_amount_export_format(self):
+        return '{0:.2f}'.format(self.amount())
+
 
 class Producer(models.Model):
     name = models.CharField(max_length=255, unique=True)
