@@ -13,6 +13,7 @@ class DeliveryNote(models.Model):
     date = models.DateTimeField(default=timezone.now)
     product = models.ForeignKey("Product", on_delete=models.PROTECT)
     quantity = models.DecimalField("Cantidad", max_digits=6, decimal_places=3)
+    sheet_number = models.CharField("Nº de hoja", max_length=6, blank=True, default='')
 
     def amount(self):
         return self.quantity * self.product.get_price_on(self.date)

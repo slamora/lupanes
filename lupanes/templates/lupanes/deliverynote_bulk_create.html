@@ -17,6 +17,7 @@
   <form class="form" method="post">
     {% csrf_token %}
 
+    {% bootstrap_field form.sheet_number %}
     {% bootstrap_field form.customer %}
     {% bootstrap_field form.product %}
 

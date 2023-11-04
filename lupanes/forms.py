@@ -63,7 +63,7 @@ class DeliveryNoteForm(forms.ModelForm):
 
     class Meta:
         model = DeliveryNote
-        fields = ["customer", "product", "quantity", "date"]
+        fields = ["sheet_number", "customer", "product", "quantity", "date"]
 
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop("user")
