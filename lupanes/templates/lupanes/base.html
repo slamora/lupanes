@@ -1,10 +1,11 @@
-{% load django_bootstrap5 static %}
+{% load django_bootstrap5 pwa static %}
 <!DOCTYPE html>
 <html lang="es">
 
 <head>
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  {% progressive_web_app_meta %}
 
   <title>Albaranes | Lupierra</title>
 
