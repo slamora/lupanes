@@ -162,10 +162,11 @@ STATIC_URL = 'static/'
 
 STATIC_ROOT = env('STATIC_ROOT')
 
-if DEBUG:
-    STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
-else:
-    STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.ManifestStaticFilesStorage'
+STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
+
+# TODO(@slamora): disabled ManifestStatic because causes 500 error on /offline/ pwa page
+# if not DEBUG:
+#     STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.ManifestStaticFilesStorage'
 
 MEDIA_URL = 'media/'
 
