@@ -33,7 +33,7 @@
       <tr>
         <td>{{ forloop.counter }}</td>
         <td>{{ customer.username }}</td>
-        <td class="amount">{{ customer.total_export_format }}</td>
+        <td class="amount">{{ customer.total_export_format|default:"ERROR: no puede calcularse el total de la nevera." }}</td>
       </tr>
       {% endfor %}
     </tbody>

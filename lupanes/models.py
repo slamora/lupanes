@@ -1,6 +1,9 @@
 from django.conf import settings
 from django.db import models
 from django.utils import timezone
+from django.utils.formats import date_format
+
+from lupanes.exceptions import PriceDoesNotExistOnDate
 
 
 class DeliveryNote(models.Model):
@@ -64,7 +67,11 @@ class Product(models.Model):
     def get_price_on(self, date=None):
         if date is None:
             date = timezone.now()
-        pprice = self.productprice_set.filter(start_date__lte=date).latest("start_date")
+        try:
+            pprice = self.productprice_set.filter(start_date__lte=date).latest("start_date")
+        except ProductPrice.DoesNotExist:
+            short_date = date_format(date, settings.SHORT_DATE_FORMAT)
+            raise PriceDoesNotExistOnDate(f"Price for product {self.pk} {self.name} does not exist on {short_date}")
         return pprice.value
 
 
