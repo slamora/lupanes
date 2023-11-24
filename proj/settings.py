@@ -74,6 +74,7 @@ INSTALLED_APPS = [
     'post_office',
     'lupanes',
     'lupanes.users',
+    'pwa',
 ]
 
 MIDDLEWARE = [
@@ -161,10 +162,11 @@ STATIC_URL = 'static/'
 
 STATIC_ROOT = env('STATIC_ROOT')
 
-if DEBUG:
-    STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
-else:
-    STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.ManifestStaticFilesStorage'
+STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
+
+# TODO(@slamora): disabled ManifestStatic because causes 500 error on /offline/ pwa page
+# if not DEBUG:
+#     STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.ManifestStaticFilesStorage'
 
 MEDIA_URL = 'media/'
 
@@ -236,6 +238,43 @@ LOGGING = {
         },
     },
 }
+
+
+# PWA (django-pwa)
+
+PWA_APP_DEBUG_MODE = DEBUG
+
+PWA_APP_NAME = 'Albaranes Lupierra'
+PWA_APP_DESCRIPTION = "Albaranes digitales Lupierra"
+PWA_APP_THEME_COLOR = '#ffffff'
+PWA_APP_BACKGROUND_COLOR = '#ffffff'
+PWA_APP_DISPLAY = 'standalone'
+PWA_APP_SCOPE = '/'
+PWA_APP_ORIENTATION = 'any'
+PWA_APP_START_URL = '/'
+PWA_APP_STATUS_BAR_COLOR = 'default'
+PWA_APP_ICONS = [
+    {
+        "src": "/static/android-chrome-192x192.png",
+        "sizes": "192x192",
+        "type": "image/png"
+    },
+    {
+        "src": "/static/android-chrome-512x512.png",
+        "sizes": "512x512",
+        "type": "image/png"
+    }
+]
+PWA_APP_ICONS_APPLE = [{
+    'src': '/static/apple-touch-icon.png',
+    'sizes': '180x180'
+}]
+PWA_APP_SPLASH_SCREEN = [{
+    'src': '/static/android-chrome-512x512.png',
+    'media': '(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2)'
+}]
+PWA_APP_DIR = 'ltr'
+PWA_APP_LANG = 'es-ES'
 
 
 # Lupierra custom settings

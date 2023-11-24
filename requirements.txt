@@ -5,5 +5,6 @@ django-bootstrap5==23.3
 django-environ
 django-extensions
 django-post_office==3.6.3
+django-pwa
 dj_database_url==1.2.0
 psycopg2-binary==2.9.5

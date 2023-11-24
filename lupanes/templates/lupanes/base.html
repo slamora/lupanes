@@ -1,10 +1,11 @@
-{% load django_bootstrap5 static %}
+{% load django_bootstrap5 pwa static %}
 <!DOCTYPE html>
 <html lang="es">
 
 <head>
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  {% progressive_web_app_meta %}
 
   <title>Albaranes | Lupierra</title>
 
@@ -12,7 +13,6 @@
   <link rel="apple-touch-icon" sizes="180x180" href="{% static 'apple-touch-icon.png' %}">
   <link rel="icon" type="image/png" sizes="32x32" href="{% static 'favicon-32x32.png' %}">
   <link rel="icon" type="image/png" sizes="16x16" href="{% static 'favicon-16x16.png' %}">
-  <link rel="manifest" href="{% static 'site.webmanifest' %}">
   <!-- /favicon -->
 
   {% bootstrap_css %}
@@ -138,7 +138,7 @@
             <i class="fa-solid fa-leaf"></i>
           </a>
           <ul class="list-unstyled small text-muted">
-            <li class="mb-2">Designed and built with all the love in the world by the <a href="https://santiagolamora.com">Santiago Lamora</a> with the help of Lupierra members.</li>
+            <li class="mb-2">Designed and built with all the love in the world by <a href="https://santiagolamora.com">Santiago Lamora</a> with the help of Lupierra members.</li>
             <li class="mb-2">Code licensed <a href="https://github.com/slamora/lupanes//blob/main/LICENSE" target="_blank" rel="license noopener">BSD</a>.</li>
             <li class="mb-2">Currently v{{ version }}</li>
             <li class="mb-2"> <a class="nav-link py-2 px-0 px-lg-2" href="https://github.com/slamora/lupanes" target="_blank" rel="noopener">
