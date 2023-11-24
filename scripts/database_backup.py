@@ -6,6 +6,7 @@
 # https://www.pythoncircle.com/post/360/how-to-backup-database-periodically-on-pythonanywhere-server/
 #
 # Adapted by Santiago Lamora
+# upload to Google Drive with [gdrive](https://github.com/glotlabs/gdrive)
 """
 import datetime
 import django

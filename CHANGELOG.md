@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## main
 - [added] PWA
 - [added] `tienda` Export albaranes list.
+- [fixed] #13 Handle error if there is no price for a product on a specific date.
 
 ## 0.1.1 - 2023-06-16
 - [fixed] Regenerate users initial migration (changed user manager).

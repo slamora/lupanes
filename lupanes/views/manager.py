@@ -9,9 +9,11 @@ from django.db.models import QuerySet
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
 from django.utils.formats import date_format
-from django.views.generic import CreateView, DeleteView, ListView, RedirectView, UpdateView
+from django.views.generic import (CreateView, DeleteView, ListView,
+                                  RedirectView, UpdateView)
 from django.views.generic.dates import MonthArchiveView, MonthMixin, YearMixin
 
+from lupanes.exceptions import PriceDoesNotExistOnDate
 from lupanes.forms import DeliveryNoteForm
 from lupanes.models import DeliveryNote
 from lupanes.users.mixins import ManagerAuthMixin
@@ -60,9 +62,15 @@ class DeliveryNoteSummaryView(ManagerAuthMixin, YearMixin, MonthMixin, ListView)
                 date__date__month=month,
             )
             for note in notes:
-                customer.total += note.amount()
+                try:
+                    customer.total += note.amount()
+                except PriceDoesNotExistOnDate as e:
+                    messages.error(self.request, e)
+                    customer.total = None
+                    break
 
-            customer.total_export_format = '{0:.2f}'.format(customer.total)
+            if customer.total is not None:
+                customer.total_export_format = '{0:.2f}'.format(customer.total)
 
         return qs
 

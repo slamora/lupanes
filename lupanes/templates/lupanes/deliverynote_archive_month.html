@@ -56,7 +56,8 @@
     </thead>
     <tbody>
       {% for note in object_list %}
-      <tr>
+      {% with amount=note.get_amount_export_format %}
+      <tr {% if not amount %}class="bg-danger text-white"{% endif %}>
         <td>{{ forloop.counter }}</td>
         <td>{{ note.sheet_number }}</td>
         <td>{{ note.date|date:"SHORT_DATE_FORMAT" }}</td>
@@ -70,7 +71,19 @@
           {% else %}{{ note.quantity|floatformat:0 }}{% endif %}
           {{ note.product.unit }}
         </td>
-        <td>{{ note.get_amount_export_format }}</td>
+
+        {% if amount %}
+        <td>{{ amount }}</td>
+        {% else %}
+        <td>
+          ERROR: no existe precio para este producto en esta fecha.<br><br>
+          <span class="text-dark">CONSEJO: añade un precio
+            anterior o igual a la fecha del albarán ({{ note.date|date:"SHORT_DATE_FORMAT" }}) en
+            <a class="text-warning" href="{% url 'lupanes:product-edit' note.product.pk %}">la página del
+            producto</a>.</span>
+        </td>
+        {% endif %}
+
         <td>
           <a class="btn btn-outline-warning" href="{% url 'lupanes:deliverynote-edit-bulk' note.pk %}">
             <i class="fa-solid fa-pencil" title="editar albarán" aria-hidden="true"></i></a>
@@ -78,6 +91,7 @@
             <i class="fa-solid fa-trash" title="borrar albarán" aria-hidden="true"></i></a>
           </td>
       </tr>
+      {% endwith %}
       {% endfor %}
     </tbody>
   </table>
