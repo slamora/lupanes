@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.utils.formats import date_format
 
-from lupanes.models import DeliveryNote, Producer, Product
+from lupanes.models import DeliveryNote, Producer, Product, ProductPrice
 
 
 @admin.register(DeliveryNote)
@@ -15,10 +15,15 @@ class DeliveryNoteAdmin(admin.ModelAdmin):
     date_short.short_description = "Date"
 
 
+class ProductPriceInline(admin.TabularInline):
+    model = ProductPrice
+
+
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
     list_display = ["name", "producer", "unit", "is_active"]
     ordering = ["name"]
+    inlines = [ProductPriceInline]
 
 
 admin.site.register(Producer)
