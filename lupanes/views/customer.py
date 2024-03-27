@@ -29,15 +29,8 @@ class DashboardView(LoginRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
         context = super().get_context_data(**kwargs)
-        from lupanes import utils
-        balance = utils.search_nevera_balance(self.request.user.username)
-        import decimal
-        try:
-            balance = decimal.Decimal(balance.replace(",", "."))
-        except decimal.InvalidOperation:
-            pass
 
-        context["balance"] = balance
+        context["balance"] = self.request.user.current_balance
 
         return context
 
