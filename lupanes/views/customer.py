@@ -27,6 +27,13 @@ User = get_user_model()
 class DashboardView(LoginRequiredMixin, TemplateView):
     template_name = "lupanes/dashboard.html"
 
+    def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+
+        context["balance"] = self.request.user.current_balance
+
+        return context
+
 
 class DeliveryNoteCreateView(CustomerAuthMixin, CreateView):
     form_class = DeliveryNoteCreateForm

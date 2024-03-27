@@ -1,8 +1,13 @@
-from django.contrib.auth.models import AbstractUser, UserManager as ContribUserManager
+import decimal
+
+from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import UserManager as ContribUserManager
 from django.db import models
 from django.db.models.functions import Lower
+from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 
+from lupanes import utils
 from lupanes.users import CUSTOMERS_GROUP, MANAGERS_GROUP
 from lupanes.users.validators import CustomUnicodeUsernameValidator
 
@@ -44,3 +49,17 @@ class User(AbstractUser):
     @property
     def is_manager(self):
         return self.groups.filter(name=MANAGERS_GROUP).exists()
+
+    @cached_property
+    def current_balance(self):
+        if not self.is_customer:
+            return
+
+        balance = utils.search_nevera_balance(self.username)
+
+        try:
+            balance = decimal.Decimal(balance.replace(",", "."))
+        except decimal.InvalidOperation:
+            pass
+
+        return balance
