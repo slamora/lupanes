@@ -27,6 +27,20 @@ User = get_user_model()
 class DashboardView(LoginRequiredMixin, TemplateView):
     template_name = "lupanes/dashboard.html"
 
+    def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        from lupanes import utils
+        balance = utils.search_nevera_balance(self.request.user.username)
+        import decimal
+        try:
+            balance = decimal.Decimal(balance.replace(",", "."))
+        except decimal.InvalidOperation:
+            pass
+
+        context["balance"] = balance
+
+        return context
+
 
 class DeliveryNoteCreateView(CustomerAuthMixin, CreateView):
     form_class = DeliveryNoteCreateForm
