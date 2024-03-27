@@ -17,8 +17,10 @@ def search_nevera_balance(nevera):
     worksheet = load_spreadsheet()
     values = worksheet.get_all_values()
 
+    nevera = nevera.lower()
     for row in values:
-        if row[0] == nevera:
+        current = row[0].strip().lower()
+        if current == nevera:
             return row[1]
 
     return "N/A"
