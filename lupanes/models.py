@@ -85,3 +85,12 @@ class ProductPrice(models.Model):
 
     def __str__(self) -> str:
         return f"{self.product.name} - {self.value} ({self.start_date})"
+
+
+class ProductStock(models.Model):
+    product = models.OneToOneField(Product, on_delete=models.CASCADE)
+    quantity = models.DecimalField(max_digits=6, decimal_places=3)
+    date = models.DateTimeField()
+
+    def __str__(self) -> str:
+        return f"{self.product.name} - {self.quantity} {self.product.unit}"
