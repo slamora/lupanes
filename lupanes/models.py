@@ -88,7 +88,7 @@ class ProductPrice(models.Model):
 
 
 class ProductStock(models.Model):
-    product = models.OneToOneField(Product, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.DecimalField(max_digits=6, decimal_places=3)
     date = models.DateTimeField()
 
