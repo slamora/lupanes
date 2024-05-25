@@ -5,8 +5,11 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## main
+
+## 0.1.2 - 2024-05-25
 - [added] PWA
 - [added] `tienda` Export albaranes list.
+- [added] #15 Current customer balance.
 - [fixed] #13 Handle error if there is no price for a product on a specific date.
 
 ## 0.1.1 - 2023-06-16
