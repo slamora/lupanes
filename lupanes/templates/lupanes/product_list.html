@@ -20,7 +20,7 @@
         <th>#</th>
         <th>Nombre</th>
         <th>Productor</th>
-        <th>Unidad</th>
+        <th>Stock</th>
         <th>Precio (actual)</th>
         {% if request.user.is_manager %}
         <th>¿Activo?</th>
@@ -35,14 +35,24 @@
         <td>{{ forloop.counter }}</td>
         <td>
           {% if request.user.is_manager %}
-            <a href="{% url 'lupanes:product-edit' product.pk %}" title="editar">
-              {{ product.name }}</a>
+          <a href="{% url 'lupanes:product-edit' product.pk %}" title="editar">
+            {{ product.name }}</a>
           {% else %}
-            {{ product.name }}
+          {{ product.name }}
           {% endif %}
         </td>
         <td>{{ product.producer }}</td>
-        <td>{{ product.get_unit_display }}</td>
+        {% with product.get_current_stock as stock %}
+        <td class="text-nowrap">
+          {% if stock %}
+          {% if product.unit_accept_decimals %}{{ stock }}
+          {% else %}{{ stock|floatformat:0 }}{% endif %}
+          {% else %}
+          ???
+          {% endif %}
+          {{ product.unit }}{{ stock|pluralize }}
+        </td>
+        {% endwith %}
         <td>{{ product.get_current_price }} €</td>
         {% if request.user.is_manager %}
         <td>{{ product.is_active|yesno:"Sí,No"}}</td>

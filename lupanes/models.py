@@ -74,6 +74,19 @@ class Product(models.Model):
             raise PriceDoesNotExistOnDate(f"Price for product {self.pk} {self.name} does not exist on {short_date}")
         return pprice.value
 
+    def get_current_stock(self):
+        try:
+            first_stock = self.productstock_set.earliest("date")
+        except ProductStock.DoesNotExist:
+            return None
+
+        stock = self.productstock_set.aggregate(models.Sum('quantity'))['quantity__sum']
+        consumed = self.deliverynote_set.filter(date__gte=first_stock.date).aggregate(
+            models.Sum('quantity'))['quantity__sum']
+        if consumed is None:
+            consumed = 0
+        return stock - consumed
+
 
 class ProductPrice(models.Model):
     value = models.DecimalField(max_digits=5, decimal_places=2)
@@ -85,3 +98,12 @@ class ProductPrice(models.Model):
 
     def __str__(self) -> str:
         return f"{self.product.name} - {self.value} ({self.start_date})"
+
+
+class ProductStock(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    quantity = models.DecimalField(max_digits=6, decimal_places=3)
+    date = models.DateTimeField()
+
+    def __str__(self) -> str:
+        return f"{self.product.name} - {self.quantity} {self.product.unit}"
