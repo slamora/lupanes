@@ -7,6 +7,10 @@
 <h2>¿Qué quieres hacer?</h2>
 
 {% if request.user.is_customer %}
+
+<div class="alert alert-{% if balance > 0 %}primary{% else %}danger{% endif %}" role="alert">
+  <strong>Tu saldo es de {{ balance|floatformat:"2" }} €</strong>
+</div>
 <div class="d-grid gap-2 col-lg-4">
   <a class="btn btn-lg btn-outline-success" href="{% url 'lupanes:deliverynote-new' %}">
     <i class="fa-solid fa-plus"></i> Apuntar mi compra (albarán)</a>

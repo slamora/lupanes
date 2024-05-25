@@ -1,3 +1,4 @@
+import logging
 from typing import Any, Dict
 
 from django.conf import settings
@@ -16,16 +17,30 @@ from django.utils.translation import gettext as _
 from django.views.generic import FormView, RedirectView, TemplateView
 from django.views.generic.dates import MonthArchiveView
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
+from gspread.exceptions import APIError
 
 from lupanes.forms import DeliveryNoteCreateForm, NotifyMissingProductForm
 from lupanes.models import DeliveryNote
 from lupanes.users.mixins import CustomerAuthMixin
 
+logger = logging.getLogger(__name__)
 User = get_user_model()
 
 
 class DashboardView(LoginRequiredMixin, TemplateView):
     template_name = "lupanes/dashboard.html"
+
+    def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+
+        try:
+            context["balance"] = self.request.user.current_balance
+        except APIError as e:
+            logger.error(f"Cannot fetch nevera balance: {e}")
+            messages.warning("Fallo temporal, error al obtener tu saldo.")
+            context["balance"] = "N/A"
+
+        return context
 
 
 class DeliveryNoteCreateView(CustomerAuthMixin, CreateView):
