@@ -2,6 +2,15 @@
 {% load i18n django_bootstrap5 %}
 
 {% block login_content %}
+{% if request.user.is_authenticated %}
+
+  Redirigiendo a la aplicación... <br>
+  <a href="{% url 'root_index' %}">Pulsa aquí si no se redirige.</a>
+  <script>
+    window.location.replace("{% url 'root_index' %}");
+  </script>
+
+{% else %}
 <div>
   {% bootstrap_form_errors form %}
   <form action="{% url 'users:login' %}" role="form" method="post">
@@ -61,5 +70,5 @@
 
   })();
 </script>
-
+{% endif %}
 {% endblock login_content %}
