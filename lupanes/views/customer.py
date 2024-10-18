@@ -37,7 +37,7 @@ class DashboardView(LoginRequiredMixin, TemplateView):
             context["balance"] = self.request.user.current_balance
         except APIError as e:
             logger.error(f"Cannot fetch nevera balance: {e}")
-            messages.warning("Fallo temporal, error al obtener tu saldo.")
+            messages.warning(self.request, "Fallo temporal, error al obtener tu saldo.")
             context["balance"] = "N/A"
 
         return context
