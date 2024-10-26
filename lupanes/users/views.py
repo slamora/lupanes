@@ -25,19 +25,22 @@ class CustomerCreateView(ManagerAuthMixin, CreateView):
         response = super().form_valid(form)
         form.instance.groups.add(get_customers_group())
 
-        self.send_password_reset_email(form)
+        self.send_password_reset_email(form.instance)
         return response
 
-    def send_password_reset_email(self, form: CustomerForm):
-        uidb64 = urlsafe_base64_encode(force_bytes(form.instance.pk))
-        token = default_token_generator.make_token(form.instance)
+    def send_password_reset_email(self, new_user):
+        new_user.set_unusable_password()
+        new_user.save()
+
+        uidb64 = urlsafe_base64_encode(force_bytes(new_user.pk))
+        token = default_token_generator.make_token(new_user)
 
         reset_path = reverse_lazy('users:password_reset_confirm', kwargs={
             'uidb64': uidb64,
             'token': token
         })
         reset_link = self.request.build_absolute_uri(reset_path)
-        form.instance.email_user(
+        new_user.email_user(
             subject="Establece tu contraseña | App Albaranes Lupierra",
             message=f"Hola! Establece tu contraseña para acceder a la app usando el siguiente enlace: {reset_link}",
         )
