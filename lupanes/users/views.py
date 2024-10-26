@@ -1,13 +1,17 @@
 from typing import Any
+
+from django.contrib.auth import get_user_model
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.tokens import default_token_generator
 from django.http import HttpResponse
 from django.urls import reverse_lazy
+from django.utils.encoding import force_bytes
+from django.utils.http import urlsafe_base64_encode
 from django.views.generic import CreateView, DetailView, FormView
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib.auth import get_user_model
 
+from lupanes.users import get_customers_group
 from lupanes.users.forms import AuthForm, CustomerForm
 from lupanes.users.mixins import ManagerAuthMixin
-from lupanes.users import get_customers_group
 
 User = get_user_model()
 
@@ -20,7 +24,23 @@ class CustomerCreateView(ManagerAuthMixin, CreateView):
     def form_valid(self, form: CustomerForm) -> HttpResponse:
         response = super().form_valid(form)
         form.instance.groups.add(get_customers_group())
+
+        self.send_password_reset_email(form)
         return response
+
+    def send_password_reset_email(self, form: CustomerForm):
+        uidb64 = urlsafe_base64_encode(force_bytes(form.instance.pk))
+        token = default_token_generator.make_token(form.instance)
+
+        reset_path = reverse_lazy('users:password_reset_confirm', kwargs={
+            'uidb64': uidb64,
+            'token': token
+        })
+        reset_link = self.request.build_absolute_uri(reset_path)
+        form.instance.email_user(
+            subject="Establece tu contraseña | App Albaranes Lupierra",
+            message=f"Hola! Establece tu contraseña para acceder a la app usando el siguiente enlace: {reset_link}",
+        )
 
 
 class CustomerProfileView(LoginRequiredMixin, DetailView):
