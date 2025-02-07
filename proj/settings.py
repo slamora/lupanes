@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
+import os
 import datetime
 from email.utils import getaddresses
 from pathlib import Path
@@ -115,7 +116,8 @@ WSGI_APPLICATION = 'proj.wsgi.application'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
 DATABASES = {
-    'default': {
+    'default': env.db(),
+    'docker': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'albaranes',
         'USER': 'lupierra',
@@ -124,6 +126,10 @@ DATABASES = {
         'PORT': '5432',
     }
 }
+
+# Check for an environment variable to decide if we use the docker database
+if os.environ.get("USE_DOCKER_DB", "false").lower() in ("true", "1", "yes"):
+    DATABASES['default'] = DATABASES['docker']
 
 
 # Password validation
