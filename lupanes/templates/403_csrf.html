@@ -1,0 +1,86 @@
+<html lang="es">
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <meta name="robots" content="NONE,NOARCHIVE" />
+    <title>403 Forbidden</title>
+    <style type="text/css">
+      html * {
+        padding: 0;
+        margin: 0;
+      }
+      body * {
+        padding: 10px 20px;
+      }
+      body * * {
+        padding: 0;
+      }
+      body {
+        font: small sans-serif;
+        background: #eee;
+        color: #000;
+      }
+      body > div {
+        border-bottom: 1px solid #ddd;
+      }
+      h1 {
+        font-weight: normal;
+        margin-bottom: 0.4em;
+      }
+      h1 span {
+        font-size: 60%;
+        color: #666;
+        font-weight: normal;
+      }
+      #info {
+        background: #f6f6f6;
+      }
+      #info ul {
+        margin: 0.5em 4em;
+      }
+      #info p,
+      #summary p {
+        padding-top: 10px;
+      }
+      #summary {
+        background: #ffc;
+      }
+      #explanation {
+        background: #eee;
+        border-bottom: 0px none;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="summary">
+      <h1>Prohibido <span>(403)</span></h1>
+      <p>La verificación CSRF ha fallado. Solicitud abortada.</p>
+      <p>
+        Serás redirigido automáticamente en
+        <span id="countdown">5</span>
+        segundos...
+      </p>
+      <p>
+        Puedes
+        <a id="redirect-link" href="{% url 'users:login' %}"
+          >hacer clic aquí para volver a la página de inicio</a
+        >.
+      </p>
+    </div>
+
+    <script>
+      let seconds = 5;
+      let countdown = document.getElementById("countdown");
+
+      let interval = setInterval(function () {
+        seconds--;
+        countdown.textContent = seconds;
+
+        if (seconds <= 0) {
+          clearInterval(interval);
+          let redirectLink = document.getElementById("redirect-link");
+          window.location.href = redirectLink.href;
+        }
+      }, 1000);
+    </script>
+  </body>
+</html>
