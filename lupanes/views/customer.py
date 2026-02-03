@@ -35,10 +35,14 @@ class DashboardView(LoginRequiredMixin, TemplateView):
 
         try:
             context["balance"] = self.request.user.current_balance
+            context["consumption"] = self.request.user.current_month_consumption()
+            context["projected_balance"] = self.request.user.projected_balance()
         except APIError as e:
             logger.error(f"Cannot fetch nevera balance: {e}")
             messages.warning(self.request, "Fallo temporal, error al obtener tu saldo.")
             context["balance"] = "N/A"
+            context["consumption"] = None
+            context["projected_balance"] = None
 
         return context
 
