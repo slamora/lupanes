@@ -23,11 +23,11 @@
 
     <!-- Consumo del Mes -->
     <div class="col-12 col-md-4">
-      <div class="p-2 {% if projected_balance and projected_balance <= 0 %}border-start border-end{% endif %}">
+      <div class="p-2 {% if projected_balance is not None and projected_balance <= 0 %}border-start border-end{% endif %}">
         <small class="d-block text-muted mb-1">
           <i class="fa-solid fa-shopping-cart"></i> Consumo del Mes
         </small>
-        <strong class="fs-4">{% if consumption %}{{ consumption|floatformat:"2" }}{% else %}0.00{% endif %} €</strong>
+        <strong class="fs-4">{% if consumption is not None %}{{ consumption|floatformat:"2" }}{% else %}0.00{% endif %} €</strong>
       </div>
     </div>
 
@@ -38,7 +38,7 @@
           <i class="fa-solid fa-chart-line"></i> Previsión de Saldo
         </small>
         <strong class="fs-4">
-          {% if projected_balance %}{{ projected_balance|floatformat:"2" }}{% else %}N/A{% endif %} €
+          {% if projected_balance is not None %}{{ projected_balance|floatformat:"2" }}{% else %}N/A{% endif %} €
         </strong>
       </div>
     </div>

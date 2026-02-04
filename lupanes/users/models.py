@@ -92,7 +92,7 @@ class User(AbstractUser):
             return None
 
         balance = self.current_balance
-        if balance is None or balance == "N/A":
+        if balance is None or not isinstance(balance, decimal.Decimal):
             return None
 
         consumption = self.current_month_consumption()

@@ -17,13 +17,13 @@ Usage:
 import os
 import sys
 import django
-from datetime import datetime, timedelta
+
 from decimal import Decimal
-from random import choice, randint, uniform, sample
+from random import choice, randint, uniform
 from pathlib import Path
 
 # Setup Django environment
-BASE_DIR = Path(__file__).resolve().parent
+BASE_DIR = Path(__file__).resolve().parent.parent
 sys.path.append(str(BASE_DIR))
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'proj.settings')
 django.setup()
@@ -79,17 +79,17 @@ PRODUCTS = [
     ("Vino Tinto Crianza", "Bodega Los Viñedos", "BOTELLA", "6.50"),
     ("Vino Blanco", "Bodega Los Viñedos", "BOTELLA", "5.20"),
     ("Leche Entera", "Lácteos Naturales", "LITRO", "1.10"),
-    ("Yogur Natural", "Lácteos Naturales", "PAQUETE", "2.80"),
-    ("Queso Curado", "Lácteos Naturales", "KG", "12.50"),
-    ("Pan de Pueblo", "Pan de Pueblo", "UNIDAD", "1.80"),
-    ("Barra Integral", "Pan de Pueblo", "UNIDAD", "2.00"),
-    ("Miel de Romero", "Miel de las Sierras", "BOTE", "7.50"),
-    ("Miel de Azahar", "Miel de las Sierras", "BOTE", "8.20"),
-    ("Naranjas", "Frutas del Campo", "KG", "1.90"),
-    ("Manzanas", "Frutas del Campo", "KG", "2.20"),
-    ("Pimientos", "Verduras Frescas S.L.", "KG", "3.10"),
-    ("Calabacines", "Verduras Frescas S.L.", "KG", "2.40"),
-    ("Aceitunas Aliñadas", "Conservas Artesanas", "GARRAFA", "15.50"),
+    ("Yogur Natural", "Lácteos Naturales", "paquete", "2.80"),
+    ("Queso Curado", "Lácteos Naturales", "Kg", "12.50"),
+    ("Pan de Pueblo", "Pan de Pueblo", "unidad", "1.80"),
+    ("Barra Integral", "Pan de Pueblo", "unidad", "2.00"),
+    ("Miel de Romero", "Miel de las Sierras", "bote", "7.50"),
+    ("Miel de Azahar", "Miel de las Sierras", "bote", "8.20"),
+    ("Naranjas", "Frutas del Campo", "Kg", "1.90"),
+    ("Manzanas", "Frutas del Campo", "Kg", "2.20"),
+    ("Pimientos", "Verduras Frescas S.L.", "Kg", "3.10"),
+    ("Calabacines", "Verduras Frescas S.L.", "Kg", "2.40"),
+    ("Aceitunas Aliñadas", "Conservas Artesanas", "garrafa", "15.50"),
 ]
 
 
@@ -280,7 +280,7 @@ def create_delivery_notes(customers, managers, products, num_notes=100):
     print(f"\nCreating {num_notes} delivery notes...")
 
     today = timezone.now()
-    three_months_ago = today - timedelta(days=90)
+
 
     for i in range(num_notes):
         # Random date in the last 3 months
@@ -369,7 +369,7 @@ def main():
         customers, managers = create_users(customers_group, managers_group)
 
         # Create producers
-        producers = create_producers()
+        create_producers()
 
         # Create products
         products = create_products()
