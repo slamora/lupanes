@@ -8,9 +8,44 @@
 
 {% if request.user.is_customer %}
 
-<div class="alert alert-{% if balance > 0 %}primary{% else %}danger{% endif %}" role="alert">
-  <strong>Tu saldo es de {{ balance|floatformat:"2" }} €</strong>
+<!-- Panel de información financiera (no accionable) -->
+<div class="alert {% if projected_balance and projected_balance > 0 %}alert-primary{% else %}alert-danger{% endif %} mb-4" role="alert">
+  <div class="row g-2 text-center">
+    <!-- Saldo Actual -->
+    <div class="col-12 col-md-4">
+      <div class="p-2">
+        <small class="d-block text-muted mb-1">
+          <i class="fa-solid fa-wallet"></i> Saldo Actual
+        </small>
+        <strong class="fs-4">{{ balance|floatformat:"2" }} €</strong>
+      </div>
+    </div>
+
+    <!-- Consumo del Mes -->
+    <div class="col-12 col-md-4">
+      <div class="p-2 {% if projected_balance is not None and projected_balance <= 0 %}border-start border-end{% endif %}">
+        <small class="d-block text-muted mb-1">
+          <i class="fa-solid fa-shopping-cart"></i> Consumo del Mes
+        </small>
+        <strong class="fs-4">{% if consumption is not None %}{{ consumption|floatformat:"2" }}{% else %}0.00{% endif %} €</strong>
+      </div>
+    </div>
+
+    <!-- Previsión de Saldo -->
+    <div class="col-12 col-md-4">
+      <div class="p-2">
+        <small class="d-block text-muted mb-1">
+          <i class="fa-solid fa-chart-line"></i> Previsión de Saldo
+        </small>
+        <strong class="fs-4">
+          {% if projected_balance is not None %}{{ projected_balance|floatformat:"2" }}{% else %}N/A{% endif %} €
+        </strong>
+      </div>
+    </div>
+  </div>
 </div>
+
+<!-- Botones de acción -->
 <div class="d-grid gap-2 col-lg-4">
   <a class="btn btn-lg btn-outline-success" href="{% url 'lupanes:deliverynote-new' %}">
     <i class="fa-solid fa-plus"></i> Apuntar mi compra (albarán)</a>

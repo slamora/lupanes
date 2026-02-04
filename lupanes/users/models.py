@@ -4,6 +4,7 @@ from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.models import UserManager as ContribUserManager
 from django.db import models
 from django.db.models.functions import Lower
+from django.utils import timezone
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 
@@ -63,3 +64,36 @@ class User(AbstractUser):
             pass
 
         return balance
+
+    def current_month_consumption(self):
+        """Calcula el consumo total del mes en curso"""
+        if not self.is_customer:
+            return decimal.Decimal(0)
+
+        now = timezone.now()
+        notes = self.deliverynote_set.filter(
+            date__year=now.year,
+            date__month=now.month,
+        )
+
+        total = decimal.Decimal(0)
+        for note in notes:
+            try:
+                total += note.amount()
+            except Exception:
+                # Si hay algún error calculando el precio, lo ignoramos
+                pass
+
+        return total
+
+    def projected_balance(self):
+        """Calcula la previsión de saldo al final del mes"""
+        if not self.is_customer:
+            return None
+
+        balance = self.current_balance
+        if balance is None or not isinstance(balance, decimal.Decimal):
+            return None
+
+        consumption = self.current_month_consumption()
+        return balance - consumption
