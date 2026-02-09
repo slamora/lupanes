@@ -1,6 +1,4 @@
-# Use django 3.2.X because production server has an old postgres version
-# Since version 4.0 django requires PostgreSQL 12 or later is required (found 10.16).
-django==3.2.19
+django==4.2.28
 django-bootstrap5==23.3
 django-environ
 django-extensions
