@@ -51,7 +51,7 @@ class User(AbstractUser):
     def is_manager(self):
         return self.groups.filter(name=MANAGERS_GROUP).exists()
 
-    @cached_property
+    @property
     def current_balance(self):
         if not self.is_customer:
             return

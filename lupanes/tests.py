@@ -3,6 +3,7 @@ from unittest.mock import patch, MagicMock
 
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
+from django.core.cache import cache
 from django.test import TestCase
 from django.utils import timezone
 from gspread.exceptions import APIError
@@ -12,6 +13,7 @@ from lupanes.models import DeliveryNote, Producer, Product, ProductPrice
 from lupanes.users import CUSTOMERS_GROUP
 from lupanes.exceptions import RetryExhausted
 import lupanes.utils
+from lupanes.utils import search_nevera_balance
 
 User = get_user_model()
 
@@ -306,3 +308,131 @@ class RetryLogicTestCase(TestCase):
         # Delays should increase
         self.assertGreater(delays[1], delays[0])
         self.assertGreater(delays[2], delays[1])
+
+
+class CachingTestCase(TestCase):
+    """Tests for caching logic in search_nevera_balance"""
+
+    def setUp(self):
+        cache.clear()
+
+    def tearDown(self):
+        cache.clear()
+
+    @patch('lupanes.utils.load_spreadsheet')
+    def test_search_nevera_balance_caches_result(self, mock_load):
+        """Verify balance is cached after first fetch"""
+        mock_worksheet = MagicMock()
+        mock_worksheet.get_all_values.return_value = [
+            ['nevera1', '100.50'],
+        ]
+        mock_load.return_value = mock_worksheet
+
+        # First call - cache miss
+        result1 = search_nevera_balance('nevera1')
+        self.assertEqual(result1, '100.50')
+
+        # Second call - cache hit (no API call)
+        result2 = search_nevera_balance('nevera1')
+        self.assertEqual(result2, '100.50')
+
+        # Verify API called only once
+        mock_load.assert_called_once()
+
+    @patch('lupanes.utils.load_spreadsheet')
+    def test_search_nevera_balance_caches_not_found(self, mock_load):
+        """Verify 'N/A' is cached to avoid repeated lookups"""
+        mock_worksheet = MagicMock()
+        mock_worksheet.get_all_values.return_value = [
+            ['nevera1', '100.50'],
+        ]
+        mock_load.return_value = mock_worksheet
+
+        # First call - cache miss, returns N/A
+        result1 = search_nevera_balance('nonexistent')
+        self.assertEqual(result1, 'N/A')
+
+        # Second call - cache hit (no API call)
+        result2 = search_nevera_balance('nonexistent')
+        self.assertEqual(result2, 'N/A')
+
+        # Verify API called only once
+        mock_load.assert_called_once()
+
+    @patch('lupanes.utils.load_spreadsheet')
+    def test_search_nevera_balance_case_insensitive_cache(self, mock_load):
+        """Verify cache keys are case-insensitive"""
+        mock_worksheet = MagicMock()
+        mock_worksheet.get_all_values.return_value = [
+            ['nevera1', '100.50'],
+        ]
+        mock_load.return_value = mock_worksheet
+
+        # First call with lowercase
+        result1 = search_nevera_balance('nevera1')
+        self.assertEqual(result1, '100.50')
+
+        # Second call with uppercase - should hit cache
+        result2 = search_nevera_balance('NEVERA1')
+        self.assertEqual(result2, '100.50')
+
+        # Verify API called only once
+        mock_load.assert_called_once()
+
+    @patch('lupanes.utils.load_spreadsheet')
+    def test_search_nevera_balance_respects_cache_ttl(self, mock_load):
+        """Verify cache respects TTL setting"""
+        mock_worksheet = MagicMock()
+        mock_worksheet.get_all_values.return_value = [
+            ['nevera1', '100.50'],
+        ]
+        mock_load.return_value = mock_worksheet
+
+        # First call
+        result1 = search_nevera_balance('nevera1')
+        self.assertEqual(result1, '100.50')
+
+        # Verify cache key exists
+        cache_key = 'nevera_balance:nevera1'
+        self.assertEqual(cache.get(cache_key), '100.50')
+
+        # Manually delete cache to simulate expiry
+        cache.delete(cache_key)
+
+        # Next call should hit API again
+        result2 = search_nevera_balance('nevera1')
+        self.assertEqual(result2, '100.50')
+
+        # Verify API called twice
+        self.assertEqual(mock_load.call_count, 2)
+
+    @patch('lupanes.utils.load_spreadsheet')
+    def test_search_nevera_balance_caches_all_customers(self, mock_load):
+        """Verify that one API call caches ALL customers from spreadsheet"""
+        mock_worksheet = MagicMock()
+        mock_worksheet.get_all_values.return_value = [
+            ['nevera1', '100.50'],
+            ['nevera2', '200.75'],
+            ['nevera3', '50.00'],
+        ]
+        mock_load.return_value = mock_worksheet
+
+        # First call for nevera1 - cache miss, loads spreadsheet
+        result1 = search_nevera_balance('nevera1')
+        self.assertEqual(result1, '100.50')
+        self.assertEqual(mock_load.call_count, 1)
+
+        # Second call for nevera2 - cache hit (already cached from first call)
+        result2 = search_nevera_balance('nevera2')
+        self.assertEqual(result2, '200.75')
+        self.assertEqual(mock_load.call_count, 1)  # Still only 1 API call
+
+        # Third call for nevera3 - cache hit
+        result3 = search_nevera_balance('nevera3')
+        self.assertEqual(result3, '50.00')
+        self.assertEqual(mock_load.call_count, 1)  # Still only 1 API call
+
+        # Verify all three are in cache
+        self.assertEqual(cache.get('nevera_balance:nevera1'), '100.50')
+        self.assertEqual(cache.get('nevera_balance:nevera2'), '200.75')
+        self.assertEqual(cache.get('nevera_balance:nevera3'), '50.00')
