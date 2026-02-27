@@ -118,6 +118,20 @@ DATABASES = {
 }
 
 
+# Cache configuration
+# https://docs.djangoproject.com/en/4.2/topics/cache/
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'lupanes-cache',
+        'OPTIONS': {
+            'MAX_ENTRIES': 1000,  # Support up to 1000 customers
+        }
+    }
+}
+
+
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
 
@@ -280,3 +294,10 @@ LUPIERRA_BASIC_AUTH_PASS = env("LUPIERRA_BASIC_AUTH_PASS", default=get_random_st
 LUPIERRA_GSPREAD_AUTH_PATH = env("LUPIERRA_GSPREAD_AUTH_PATH")
 
 LUPIERRA_CUSTOMERS_BALANCE_URL = env("LUPIERRA_CUSTOMERS_BALANCE_URL")
+
+# Retry configuration for Google Sheets API
+LUPIERRA_GSPREAD_MAX_RETRIES = env("LUPIERRA_GSPREAD_MAX_RETRIES", default=4, cast=int)
+LUPIERRA_GSPREAD_BASE_DELAY = env("LUPIERRA_GSPREAD_BASE_DELAY", default=1.0, cast=float)
+
+# Cache TTL for customer balance (10 minutes default)
+LUPIERRA_BALANCE_CACHE_TTL = env("LUPIERRA_BALANCE_CACHE_TTL", default=600, cast=int)

@@ -19,6 +19,7 @@ from django.views.generic.dates import MonthArchiveView
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from gspread.exceptions import APIError
 
+from lupanes.exceptions import RetryExhausted
 from lupanes.forms import DeliveryNoteCreateForm, NotifyMissingProductForm
 from lupanes.models import DeliveryNote
 from lupanes.users.mixins import CustomerAuthMixin
@@ -37,9 +38,9 @@ class DashboardView(LoginRequiredMixin, TemplateView):
             context["balance"] = self.request.user.current_balance
             context["consumption"] = self.request.user.current_month_consumption()
             context["projected_balance"] = self.request.user.projected_balance()
-        except (APIError, TypeError) as e:
+        except (APIError, TypeError, RetryExhausted) as e:
             logger.error(f"Cannot fetch nevera balance: {e}")
-            messages.warning(self.request, "Fallo temporal, error al obtener tu saldo.")
+            messages.warning(self.request, "Error temporal al obtener tu saldo. Por favor, inténtalo más tarde.")
             context["balance"] = "N/A"
             context["consumption"] = None
             context["projected_balance"] = None
