@@ -1,3 +1,4 @@
+import hashlib
 import time
 import random
 import logging
@@ -41,8 +42,13 @@ def retry_on_gspread_error(max_retries=4, base_delay=1.0):
 
 
 def _get_nevera_cache_key(nevera_name):
-    """Generate cache key for customer balance"""
-    return f"nevera_balance:{nevera_name.lower()}"
+    """Generate cache key for customer balance.
+
+    Hashes the name to avoid memcached-invalid characters
+    (spaces, accented letters, etc.).
+    """
+    name_hash = hashlib.md5(nevera_name.lower().encode()).hexdigest()
+    return f"nevera_balance:{name_hash}"
 
 
 @retry_on_gspread_error(
