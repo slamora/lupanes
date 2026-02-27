@@ -1,19 +1,19 @@
 from decimal import Decimal
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
 
+import requests.exceptions
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
 from django.core.cache import cache
 from django.test import TestCase
 from django.utils import timezone
 from gspread.exceptions import APIError
-import requests.exceptions
 
+import lupanes.utils
+from lupanes.exceptions import RetryExhausted
 from lupanes.models import DeliveryNote, Producer, Product, ProductPrice
 from lupanes.users import CUSTOMERS_GROUP
-from lupanes.exceptions import RetryExhausted
-import lupanes.utils
-from lupanes.utils import search_nevera_balance
+from lupanes.utils import _get_nevera_cache_key, search_nevera_balance
 
 User = get_user_model()
 
@@ -258,7 +258,7 @@ class RetryLogicTestCase(TestCase):
         ]
         mock_service_account.return_value = mock_gc
 
-        result = lupanes.utils.load_spreadsheet()
+        lupanes.utils.load_spreadsheet()
 
         self.assertEqual(mock_gc.open_by_url.call_count, 2)
         self.assertEqual(mock_sleep.call_count, 1)
@@ -393,7 +393,7 @@ class CachingTestCase(TestCase):
         self.assertEqual(result1, '100.50')
 
         # Verify cache key exists
-        cache_key = 'nevera_balance:nevera1'
+        cache_key = _get_nevera_cache_key('nevera1')
         self.assertEqual(cache.get(cache_key), '100.50')
 
         # Manually delete cache to simulate expiry
@@ -433,6 +433,6 @@ class CachingTestCase(TestCase):
         self.assertEqual(mock_load.call_count, 1)  # Still only 1 API call
 
         # Verify all three are in cache
-        self.assertEqual(cache.get('nevera_balance:nevera1'), '100.50')
-        self.assertEqual(cache.get('nevera_balance:nevera2'), '200.75')
-        self.assertEqual(cache.get('nevera_balance:nevera3'), '50.00')
+        self.assertEqual(cache.get(_get_nevera_cache_key('nevera1')), '100.50')
+        self.assertEqual(cache.get(_get_nevera_cache_key('nevera2')), '200.75')
+        self.assertEqual(cache.get(_get_nevera_cache_key('nevera3')), '50.00')
