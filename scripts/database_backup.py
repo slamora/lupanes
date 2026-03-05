@@ -9,14 +9,13 @@
 # upload to Google Drive with [gdrive](https://github.com/glotlabs/gdrive)
 """
 import datetime
-import django
 import logging
 import os
-import sys
 import subprocess
-
+import sys
 from zipfile import ZipFile
 
+import django
 from django.conf import settings
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'proj.settings')
@@ -51,7 +50,7 @@ if not os.path.exists(BACKUP_DIR_NAME):
     os.mkdir(BACKUP_DIR_NAME)
 
 
-os.system("PGPASSWORD={password} pg_dump --host={hostname} --port={port} --username={username} --format=c --file={filename} {database}".format(
+os.system("PGPASSWORD={password} pg_dump --host={hostname} --port={port} --username={username} --format=plain --file={filename} {database}".format(
     hostname=DBHOST, port=DBPORT, username=USERNAME, password=PASSWORD, filename=backup_filename, database=DBNAME
 ))
 
