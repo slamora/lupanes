@@ -1,0 +1,98 @@
+{% extends "lupanes/base.html" %}
+{% load django_bootstrap5 %}
+
+{% block extra_style %}
+<style>
+  #product-summary .amount::after {
+    content: " €";
+  }
+</style>
+{% endblock %}
+
+{% block main %}
+<h1>Resumen por productos</h1>
+
+<form method="get" class="mb-4">
+  <div class="row g-3 align-items-end">
+    <div class="col-md-4">
+      <label for="id_products" class="form-label">Productos</label>
+      <select name="products" id="id_products" class="form-select" multiple>
+        {% for product in products %}
+        <option value="{{ product.pk }}" {% if product.pk in selected_products %}selected{% endif %}>
+          {{ product.name }} ({{ product.producer.name }})
+        </option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-md-3">
+      <label for="id_date_from" class="form-label">Desde</label>
+      <input type="date" name="date_from" id="id_date_from" class="form-control" value="{{ date_from }}">
+    </div>
+    <div class="col-md-3">
+      <label for="id_date_to" class="form-label">Hasta</label>
+      <input type="date" name="date_to" id="id_date_to" class="form-control" value="{{ date_to }}">
+    </div>
+    <div class="col-md-2">
+      <button type="submit" class="btn btn-success w-100">Filtrar</button>
+    </div>
+  </div>
+</form>
+
+{% if product_summary %}
+<div class="table-responsive">
+  <table id="product-summary" class="table table-sm table-striped"
+    data-export-options='{"fileName": "resumen-productos"}'>
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Producto</th>
+        <th>Productor</th>
+        <th>Cantidad total</th>
+        <th>Importe total</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in product_summary %}
+      <tr>
+        <td>{{ forloop.counter }}</td>
+        <td>{{ item.product__name }}</td>
+        <td>{{ item.product__producer__name }}</td>
+        <td class="text-nowrap">{{ item.total_qty }} {{ item.product__unit }}</td>
+        <td class="amount">{{ item.total_amount|floatformat:2 }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+    <tfoot>
+      <tr class="fw-bold">
+        <td colspan="3">Total</td>
+        <td></td>
+        <td class="amount">{{ totals.total_amount|floatformat:2 }}</td>
+      </tr>
+    </tfoot>
+  </table>
+</div>
+{% else %}
+<div class="alert alert-info">
+  No hay albaranes para el periodo seleccionado.
+</div>
+{% endif %}
+{% endblock main %}
+
+{% block extra_script %}
+<script>
+  $(document).ready(function () {
+    $('#product-summary').DataTable({
+      dom: 'Bfrtip',
+      buttons: [
+        'copy', 'csv', 'excel', 'pdf', 'print'
+      ],
+      paging: false,
+    });
+    $('#id_products').select2({
+      placeholder: 'Selecciona productos...',
+      allowClear: true,
+      width: '100%',
+    });
+  });
+</script>
+{% endblock %}
