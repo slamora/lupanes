@@ -52,6 +52,7 @@
         <th>Producto</th>
         <th>Productor</th>
         <th>Cantidad total</th>
+        <th>Unidad</th>
         <th>Importe total</th>
       </tr>
     </thead>
@@ -61,7 +62,8 @@
         <td>{{ forloop.counter }}</td>
         <td>{{ item.product__name }}</td>
         <td>{{ item.product__producer__name }}</td>
-        <td class="text-nowrap">{{ item.total_qty }} {{ item.product__unit }}</td>
+        <td>{{ item.total_qty }}</td>
+        <td>{{ item.product__unit }}</td>
         <td class="amount">{{ item.total_amount|floatformat:2 }}</td>
       </tr>
       {% endfor %}
@@ -69,6 +71,7 @@
     <tfoot>
       <tr class="fw-bold">
         <td colspan="3">Total</td>
+        <td></td>
         <td></td>
         <td class="amount">{{ totals.total_amount|floatformat:2 }}</td>
       </tr>
