@@ -572,6 +572,24 @@ class ProductSummaryDateFilterTest(ProductSummaryTestMixin, TestCase):
         manzana = next(p for p in products if p["product__name"] == "Manzana")
         self.assertEqual(manzana["total_qty"], Decimal("5.500"))
 
+    def test_invalid_date_range_returns_empty(self):
+        response = self.client.get(self.url, {
+            "date_from": "2026-04-01",
+            "date_to": "2026-03-31",
+        })
+        products = response.context["product_summary"]
+        self.assertEqual(len(products), 0)
+        self.assertTrue(response.context["invalid_date_range"])
+
+    def test_same_date_from_and_to_is_valid(self):
+        response = self.client.get(self.url, {
+            "date_from": "2026-03-31",
+            "date_to": "2026-03-31",
+        })
+        self.assertFalse(response.context["invalid_date_range"])
+        products = response.context["product_summary"]
+        self.assertGreater(len(products), 0)
+
     def test_filter_excludes_notes_outside_range(self):
         response = self.client.get(self.url, {
             "date_from": "2026-04-01",

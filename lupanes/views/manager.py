@@ -151,7 +151,15 @@ class ProductSummaryView(ManagerAuthMixin, ListView):
     template_name = "lupanes/product_summary.html"
     context_object_name = "product_summary"
 
+    def _has_invalid_date_range(self):
+        date_from = self.request.GET.get("date_from")
+        date_to = self.request.GET.get("date_to")
+        return date_from and date_to and date_from > date_to
+
     def get_queryset(self):
+        if self._has_invalid_date_range():
+            return []
+
         qs = DeliveryNote.objects.select_related("product", "product__producer").all()
 
         date_from = self.request.GET.get("date_from")
@@ -192,6 +200,7 @@ class ProductSummaryView(ManagerAuthMixin, ListView):
         ]
         context["date_from"] = self.request.GET.get("date_from", "")
         context["date_to"] = self.request.GET.get("date_to", "")
+        context["invalid_date_range"] = self._has_invalid_date_range()
 
         summary = context["product_summary"]
         total_amount = sum(

@@ -38,7 +38,11 @@
   </div>
 </form>
 
-{% if product_summary %}
+{% if invalid_date_range %}
+<div class="alert alert-warning">
+  La fecha "Desde" no puede ser posterior a la fecha "Hasta".
+</div>
+{% elif product_summary %}
 <div class="table-responsive">
   <table id="product-summary" class="table table-sm table-striped"
     data-export-options='{"fileName": "resumen-productos"}'>
