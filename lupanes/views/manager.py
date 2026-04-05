@@ -198,7 +198,7 @@ class ProductSummaryView(ManagerAuthMixin, ListView):
                     total_amount += note.amount()
                 except PriceDoesNotExistOnDate:
                     pass
-            item["total_amount"] = total_amount
+            item["total_amount"] = '{0:.2f}'.format(total_amount)
 
         return summary
 
@@ -215,13 +215,9 @@ class ProductSummaryView(ManagerAuthMixin, ListView):
 
         summary = context["product_summary"]
         total_amount = sum(
-            (item["total_amount"] for item in summary), Decimal("0")
-        )
-        total_qty = sum(
-            (item["total_qty"] for item in summary), Decimal("0")
+            (Decimal(item["total_amount"]) for item in summary), Decimal("0")
         )
         context["totals"] = {
-            "total_amount": total_amount,
-            "total_qty": total_qty,
+            "total_amount": '{0:.2f}'.format(total_amount),
         }
         return context

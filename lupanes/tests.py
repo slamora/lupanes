@@ -672,7 +672,7 @@ class ProductSummaryAggregationTest(ProductSummaryTestMixin, TestCase):
         # 7.0 kg * 2.50 = 17.50
         # Note: amount is calculated per-note (qty * price_on_date), so this tests
         # that the view aggregates note amounts, not just qty * current_price
-        self.assertEqual(manzana["total_amount"], Decimal("17.50"))
+        self.assertEqual(manzana["total_amount"], "17.50")
 
     def test_shows_totals_in_context(self):
         response = self.client.get(self.url, {
@@ -681,7 +681,7 @@ class ProductSummaryAggregationTest(ProductSummaryTestMixin, TestCase):
         })
         totals = response.context["totals"]
         # Total amount: Manzana 17.50 + Aguacate 8.70 + Pan 2.40 = 28.60
-        self.assertEqual(totals["total_amount"], Decimal("28.60"))
+        self.assertEqual(totals["total_amount"], "28.60")
 
     def test_empty_result_for_no_matching_notes(self):
         response = self.client.get(self.url, {

@@ -64,7 +64,7 @@
         <td>{{ item.product__producer__name }}</td>
         <td>{{ item.total_qty }}</td>
         <td>{{ item.product__unit }}</td>
-        <td class="amount">{{ item.total_amount|floatformat:2 }}</td>
+        <td class="amount">{{ item.total_amount }}</td>
       </tr>
       {% endfor %}
     </tbody>
@@ -73,7 +73,7 @@
         <td colspan="3">Total</td>
         <td></td>
         <td></td>
-        <td class="amount">{{ totals.total_amount|floatformat:2 }}</td>
+        <td class="amount">{{ totals.total_amount }}</td>
       </tr>
     </tfoot>
   </table>
