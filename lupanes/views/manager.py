@@ -151,9 +151,20 @@ class ProductSummaryView(ManagerAuthMixin, ListView):
     template_name = "lupanes/product_summary.html"
     context_object_name = "product_summary"
 
-    def _has_invalid_date_range(self):
+    def _get_default_dates(self):
+        today = timezone.now().date()
+        first_of_month = today.replace(day=1)
+        return first_of_month.isoformat(), today.isoformat()
+
+    def _get_dates(self):
         date_from = self.request.GET.get("date_from")
         date_to = self.request.GET.get("date_to")
+        if not date_from and not date_to:
+            date_from, date_to = self._get_default_dates()
+        return date_from, date_to
+
+    def _has_invalid_date_range(self):
+        date_from, date_to = self._get_dates()
         return date_from and date_to and date_from > date_to
 
     def get_queryset(self):
@@ -162,8 +173,7 @@ class ProductSummaryView(ManagerAuthMixin, ListView):
 
         qs = DeliveryNote.objects.select_related("product", "product__producer").all()
 
-        date_from = self.request.GET.get("date_from")
-        date_to = self.request.GET.get("date_to")
+        date_from, date_to = self._get_dates()
         products = self.request.GET.getlist("products")
 
         if date_from:
@@ -198,8 +208,9 @@ class ProductSummaryView(ManagerAuthMixin, ListView):
         context["selected_products"] = [
             int(pk) for pk in self.request.GET.getlist("products") if pk
         ]
-        context["date_from"] = self.request.GET.get("date_from", "")
-        context["date_to"] = self.request.GET.get("date_to", "")
+        date_from, date_to = self._get_dates()
+        context["date_from"] = date_from or ""
+        context["date_to"] = date_to or ""
         context["invalid_date_range"] = self._has_invalid_date_range()
 
         summary = context["product_summary"]
