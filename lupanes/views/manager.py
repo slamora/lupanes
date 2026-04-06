@@ -5,7 +5,7 @@ from typing import Any, Dict
 
 from django.contrib import messages
 from django.contrib.auth import get_user_model
-from django.db.models import QuerySet
+from django.db.models import QuerySet, Sum
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
 from django.utils.formats import date_format
@@ -15,7 +15,7 @@ from django.views.generic.dates import MonthArchiveView, MonthMixin, YearMixin
 
 from lupanes.exceptions import PriceDoesNotExistOnDate
 from lupanes.forms import DeliveryNoteForm
-from lupanes.models import DeliveryNote
+from lupanes.models import DeliveryNote, Product
 from lupanes.users.mixins import ManagerAuthMixin
 
 User = get_user_model()
@@ -145,3 +145,79 @@ class DeliveryNoteBulkDeleteView(ManagerAuthMixin, DeleteView):
         date = self.object.date
         messages.info(self.request, "Albarán borrado correctamente.")
         return reverse_lazy("lupanes:deliverynote-month", args=(date.year, date.month))
+
+
+class ProductSummaryView(ManagerAuthMixin, ListView):
+    template_name = "lupanes/product_summary.html"
+    context_object_name = "product_summary"
+
+    def _get_default_dates(self):
+        today = timezone.now().date()
+        first_of_month = today.replace(day=1)
+        return first_of_month.isoformat(), today.isoformat()
+
+    def _get_dates(self):
+        date_from = self.request.GET.get("date_from")
+        date_to = self.request.GET.get("date_to")
+        if not date_from and not date_to:
+            date_from, date_to = self._get_default_dates()
+        return date_from, date_to
+
+    def _has_invalid_date_range(self):
+        date_from, date_to = self._get_dates()
+        return date_from and date_to and date_from > date_to
+
+    def get_queryset(self):
+        if self._has_invalid_date_range():
+            return []
+
+        qs = DeliveryNote.objects.select_related("product", "product__producer").all()
+
+        date_from, date_to = self._get_dates()
+        products = self.request.GET.getlist("products")
+
+        if date_from:
+            qs = qs.filter(date__date__gte=date_from)
+        if date_to:
+            qs = qs.filter(date__date__lte=date_to)
+        if products:
+            qs = qs.filter(product__pk__in=products)
+
+        summary = qs.values(
+            "product__name", "product__producer__name", "product__unit"
+        ).annotate(
+            total_qty=Sum("quantity"),
+        ).order_by("product__name")
+
+        # Calculate total_amount per product using Python (price depends on note date)
+        for item in summary:
+            product_notes = qs.filter(product__name=item["product__name"])
+            total_amount = Decimal("0")
+            for note in product_notes:
+                try:
+                    total_amount += note.amount()
+                except PriceDoesNotExistOnDate:
+                    pass
+            item["total_amount"] = '{0:.2f}'.format(total_amount)
+
+        return summary
+
+    def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        context["products"] = Product.objects.filter(is_active=True).select_related("producer").order_by("name")
+        context["selected_products"] = [
+            int(pk) for pk in self.request.GET.getlist("products") if pk
+        ]
+        date_from, date_to = self._get_dates()
+        context["date_from"] = date_from or ""
+        context["date_to"] = date_to or ""
+        context["invalid_date_range"] = self._has_invalid_date_range()
+
+        summary = context["product_summary"]
+        total_amount = sum(
+            (Decimal(item["total_amount"]) for item in summary), Decimal("0")
+        )
+        context["totals"] = {
+            "total_amount": '{0:.2f}'.format(total_amount),
+        }
+        return context

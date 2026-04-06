@@ -26,6 +26,7 @@ urlpatterns = [
     path('albaranes/<int:pk>/edit-bulk/', views.DeliveryNoteBulkUpdateView.as_view(), name='deliverynote-edit-bulk'),
     path('albaranes/<int:pk>/delete-bulk/', views.DeliveryNoteBulkDeleteView.as_view(),
          name='deliverynote-delete-bulk'),
+    path('albaranes/por-producto/', views.ProductSummaryView.as_view(), name='product-summary'),
 
     path('neveras/', views.CustomerListView.as_view(), name='customer-list'),
 
