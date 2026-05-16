@@ -621,6 +621,8 @@ class ProductSummaryProductFilterTest(ProductSummaryTestMixin, TestCase):
     def test_filter_by_single_product(self):
         response = self.client.get(self.url, {
             "products": [self.aguacate.pk],
+            "date_from": "2026-03-31",
+            "date_to": "2026-04-01",
         })
         products = response.context["product_summary"]
         product_names = [p["product__name"] for p in products]
@@ -629,6 +631,8 @@ class ProductSummaryProductFilterTest(ProductSummaryTestMixin, TestCase):
     def test_filter_by_multiple_products(self):
         response = self.client.get(self.url, {
             "products": [self.manzana.pk, self.aguacate.pk],
+            "date_from": "2026-03-31",
+            "date_to": "2026-04-01",
         })
         products = response.context["product_summary"]
         product_names = sorted([p["product__name"] for p in products])
