@@ -7,7 +7,8 @@ from lupanes.models import DeliveryNote, Producer, Product, ProductPrice
 @admin.register(DeliveryNote)
 class DeliveryNoteAdmin(admin.ModelAdmin):
     list_display = ["date_short", "customer", "product", "quantity"]
-    list_filter = ["date__year"]
+    list_filter = ["customer"]
+    date_hierarchy = "date"
     search_fields = ["customer__username", "product__name"]
     ordering = ["date"]
 
