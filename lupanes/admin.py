@@ -7,6 +7,8 @@ from lupanes.models import DeliveryNote, Producer, Product, ProductPrice
 @admin.register(DeliveryNote)
 class DeliveryNoteAdmin(admin.ModelAdmin):
     list_display = ["date_short", "customer", "product", "quantity"]
+    list_filter = ["date__year"]
+    search_fields = ["customer__username", "product__name"]
     ordering = ["date"]
 
     def date_short(self, obj):
@@ -22,8 +24,10 @@ class ProductPriceInline(admin.TabularInline):
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
     list_display = ["name", "producer", "unit", "is_active"]
-    ordering = ["name"]
+    list_filter = ["producer", "is_active"]
+    search_fields = ["name", "producer__name"]
     inlines = [ProductPriceInline]
+    ordering = ["name"]
 
 
 admin.site.register(Producer)
