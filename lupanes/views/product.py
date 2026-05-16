@@ -37,7 +37,16 @@ class ProductListView(LoginRequiredMixin, ListView):
     model = Product
 
     def get_queryset(self) -> QuerySet[Any]:
-        return self.model.objects.all().order_by(Lower('name'))
+        queryset = self.model.objects.all().order_by(Lower('name'))
+        query = self.request.GET.get("q", "").strip()
+        if query:
+            queryset = queryset.filter(name__icontains=query)
+        return queryset
+
+    def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        context["search_query"] = self.request.GET.get("q", "").strip()
+        return context
 
 
 class ProductCreateView(ManagerAuthMixin, CreateView):

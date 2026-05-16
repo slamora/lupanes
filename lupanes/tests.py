@@ -554,7 +554,7 @@ class ProductSummaryDefaultDatesTest(ProductSummaryTestMixin, TestCase):
         # Test data is from March/April 2026 — current month-to-date won't include it
         # unless we're running tests in March/April 2026
         response = self.client.get(self.url)
-        products = response.context["product_summary"]
+        response.context["product_summary"]
         # We can't assert specific products since test data is in Mar/Apr 2026
         # but we CAN assert the view returns 200 and uses default dates
         self.assertEqual(response.status_code, 200)
@@ -621,6 +621,8 @@ class ProductSummaryProductFilterTest(ProductSummaryTestMixin, TestCase):
     def test_filter_by_single_product(self):
         response = self.client.get(self.url, {
             "products": [self.aguacate.pk],
+            "date_from": "2026-03-31",
+            "date_to": "2026-04-01",
         })
         products = response.context["product_summary"]
         product_names = [p["product__name"] for p in products]
@@ -629,6 +631,8 @@ class ProductSummaryProductFilterTest(ProductSummaryTestMixin, TestCase):
     def test_filter_by_multiple_products(self):
         response = self.client.get(self.url, {
             "products": [self.manzana.pk, self.aguacate.pk],
+            "date_from": "2026-03-31",
+            "date_to": "2026-04-01",
         })
         products = response.context["product_summary"]
         product_names = sorted([p["product__name"] for p in products])
@@ -690,3 +694,69 @@ class ProductSummaryAggregationTest(ProductSummaryTestMixin, TestCase):
         })
         products = response.context["product_summary"]
         self.assertEqual(len(products), 0)
+
+
+class ProductListViewSearchTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.producer = Producer.objects.create(name="Productor Test")
+        cls.products = {
+            "aceite": Product.objects.create(
+                name="Aceite de oliva",
+                producer=cls.producer,
+                unit=Product.Unit.LITRO,
+                is_active=True,
+            ),
+            "arroz": Product.objects.create(
+                name="Arroz integral",
+                producer=cls.producer,
+                unit=Product.Unit.KG,
+                is_active=True,
+            ),
+            "zumo": Product.objects.create(
+                name="Zumo de manzana",
+                producer=cls.producer,
+                unit=Product.Unit.BOTELLA,
+                is_active=False,
+            ),
+        }
+
+        price_start = date(2026, 1, 1)
+        for product in cls.products.values():
+            ProductPrice.objects.create(
+                product=product,
+                value=Decimal("1.00"),
+                start_date=price_start,
+            )
+
+        cls.user = User.objects.create_user(username="list-user", password="test1234")
+        cls.url = reverse("lupanes:product-list")
+
+    def setUp(self):
+        self.client.login(username="list-user", password="test1234")
+
+    def _product_names(self, response):
+        return [product.name for product in response.context["object_list"]]
+
+    def test_filters_by_name_with_q_param(self):
+        response = self.client.get(self.url, {"q": "acei"})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(self._product_names(response), ["Aceite de oliva"])
+
+    def test_filter_is_case_insensitive(self):
+        response = self.client.get(self.url, {"q": "ARROZ"})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(self._product_names(response), ["Arroz integral"])
+
+    def test_blank_or_whitespace_query_returns_unfiltered_queryset(self):
+        response = self.client.get(self.url, {"q": "   "})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            self._product_names(response),
+            ["Aceite de oliva", "Arroz integral", "Zumo de manzana"],
+        )
+
+    def test_preserves_search_query_in_context(self):
+        response = self.client.get(self.url, {"q": "   aceite   "})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context["search_query"], "aceite")
