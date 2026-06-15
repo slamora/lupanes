@@ -458,7 +458,11 @@ class GroupOrderReminderTests(GroupOrderTestMixin, TestCase):
         self.login(self.pablo)
 
         response = self.client.get(self._mine_url())
-        self.assertContains(response, "albarán")
+        # Detect the reminder by a phrase unique to it. The base-template navbar
+        # always contains the bare "albarán" word and the deliverynote-new URL
+        # (the "Nuevo albarán" link), so asserting on those alone is confounded
+        # by the global nav.
+        self.assertContains(response, "apuntar en tu albarán")
         # Reminder deep-links to the EXISTING albarán flow (no new write path).
         self.assertContains(response, reverse("lupanes:deliverynote-new"))
 
@@ -470,7 +474,7 @@ class GroupOrderReminderTests(GroupOrderTestMixin, TestCase):
         self.login(self.pablo)
 
         response = self.client.get(self._mine_url())
-        self.assertNotContains(response, reverse("lupanes:deliverynote-new"))
+        self.assertNotContains(response, "apuntar en tu albarán")
 
     def test_no_reminder_for_member_who_did_not_order(self):
         # @US-05 error/boundary: flag ON but member did not order => no reminder
@@ -480,7 +484,7 @@ class GroupOrderReminderTests(GroupOrderTestMixin, TestCase):
         self.login(self.pablo)  # Pablo did NOT submit
 
         response = self.client.get(self._detail_url(order))
-        self.assertNotContains(response, reverse("lupanes:deliverynote-new"))
+        self.assertNotContains(response, "apuntar en tu albarán")
 
     def test_viewing_reminder_never_creates_a_delivery_note(self):
         # @US-05 hard guarantee (D13): no DeliveryNote is ever written

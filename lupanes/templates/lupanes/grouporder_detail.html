@@ -9,6 +9,10 @@
   <span class="badge bg-secondary align-self-center">{{ object.get_status_display }}</span>
 </div>
 
+{% if submit_error %}
+<div class="alert alert-warning" role="alert">{{ submit_error }}</div>
+{% endif %}
+
 <p class="mb-1"><i class="fa-regular fa-clock"></i>
   Se cierra el {{ object.closing_date|date:"d/m/Y H:i" }}</p>
 {% if object.estimated_delivery_date %}
@@ -26,12 +30,36 @@
 {% endif %}
 
 <h2 class="h5 mt-4">Productos</h2>
+{% if object.is_open %}
+<form method="post" action="{% url 'lupanes:grouporder-submit' object.pk %}">
+  {% csrf_token %}
+  <table class="table table-sm align-middle">
+    <thead>
+      <tr><th>Producto</th><th>Precio</th><th>Tu cantidad</th></tr>
+    </thead>
+    <tbody>
+      {% for row in product_rows %}
+      <tr>
+        <td>{{ row.product.name }}{% if row.product.unit %} / {{ row.product.unit }}{% endif %}</td>
+        <td>{% if row.product.price %}{{ row.product.price }} €{% endif %}</td>
+        <td>
+          <input type="number" step="0.01" min="0" class="form-control form-control-sm"
+            name="product_{{ row.product.pk }}" value="{{ row.my_qty|default_if_none:'' }}">
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <button type="submit" class="btn btn-success">Guardar mi pedido</button>
+</form>
+{% else %}
 <ul>
-  {% for product in object.products.all %}
-  <li>{{ product.name }}{% if product.price %} — {{ product.price }} €{% endif %}
-    {% if product.unit %} / {{ product.unit }}{% endif %}</li>
+  {% for row in product_rows %}
+  <li>{{ row.product.name }}{% if row.product.price %} — {{ row.product.price }} €{% endif %}
+    {% if row.my_qty is not None %} <strong>(tu cantidad: {{ row.my_qty }})</strong>{% endif %}</li>
   {% endfor %}
 </ul>
+{% endif %}
 
 {% if tally is not None %}
 <h2 class="h5 mt-4">Resumen del pedido (sólo tú lo ves)</h2>

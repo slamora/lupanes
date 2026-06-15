@@ -16,12 +16,16 @@ from lupanes.views.product import (ProductAjaxView, ProductCreateView,
                                    ProductUpdateView)
 from lupanes.views.grouporder import (GroupOrderCreateView,
                                       GroupOrderDetailView,
-                                      GroupOrderListView)
+                                      GroupOrderListView,
+                                      GroupOrderMineView,
+                                      GroupOrderSubmitView)
 
 __all__ = [
     "GroupOrderCreateView",
     "GroupOrderDetailView",
     "GroupOrderListView",
+    "GroupOrderMineView",
+    "GroupOrderSubmitView",
     "DashboardView",
     "DeliveryNoteBulkCreateView",
     "DeliveryNoteBulkUpdateView",
