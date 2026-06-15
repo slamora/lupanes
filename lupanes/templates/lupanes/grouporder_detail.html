@@ -20,6 +20,25 @@
 {% endif %}
 {% if object.description %}<p>{{ object.description }}</p>{% endif %}
 
+{% if is_creator %}
+<div class="card mb-3">
+  <div class="card-body">
+    <div class="d-flex justify-content-between align-items-center">
+      <h2 class="h6 mb-0">Gestión del pedido</h2>
+      <a class="btn btn-sm btn-outline-secondary" href="{% url 'lupanes:grouporder-edit' object.pk %}">
+        <i class="fa-solid fa-pen"></i> Editar</a>
+    </div>
+    <form method="post" action="{% url 'lupanes:grouporder-status' object.pk %}"
+      class="mt-2 d-flex gap-2 flex-wrap">
+      {% csrf_token %}
+      <button name="status" value="closed" class="btn btn-sm btn-outline-primary">Cerrar pedido</button>
+      <button name="status" value="ordered" class="btn btn-sm btn-outline-primary">Marcar como pedido</button>
+      <button name="status" value="arrived" class="btn btn-sm btn-outline-success">Marcar como recibido</button>
+    </form>
+  </div>
+</div>
+{% endif %}
+
 {% if show_albaran_reminder %}
 <div class="alert alert-warning" role="alert">
   <i class="fa-solid fa-receipt"></i>

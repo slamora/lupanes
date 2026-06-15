@@ -4,14 +4,14 @@ from typing import Any, Dict
 
 from django.conf import settings
 from django.contrib import messages
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.core import mail
 from django.shortcuts import get_object_or_404, redirect, render
 from django.template.loader import render_to_string
 from django.utils import timezone
 from django.views import View
 from django.views.generic import DetailView, ListView, TemplateView
-from django.views.generic.edit import CreateView
+from django.views.generic.edit import CreateView, UpdateView
 
 from lupanes.forms import GroupOrderForm, GroupOrderProductFormSet
 from lupanes.models import GroupOrder, GroupOrderLineItem
@@ -52,6 +52,22 @@ def build_tally(order):
         "rows": rows,
         "totals": [totals.get(p.id, Decimal("0")) for p in products],
     }
+
+
+class GroupOrderOwnerMixin(UserPassesTestMixin):
+    """Creator-gated access. NOT manager-gated: the tienda group grants no rights.
+
+    Authenticated non-creators get 403; anonymous users are redirected to login.
+    """
+
+    def get_group_order(self):
+        if not hasattr(self, "_group_order"):
+            self._group_order = get_object_or_404(GroupOrder, pk=self.kwargs["pk"])
+        return self._group_order
+
+    def test_func(self):
+        user = self.request.user
+        return user.is_authenticated and self.get_group_order().created_by_id == user.id
 
 
 def order_view_context(order, user):
@@ -229,3 +245,59 @@ class GroupOrderMineView(CustomerAuthMixin, TemplateView):
         items.sort(key=lambda d: d["order"].created_at, reverse=True)
         context["order_items"] = items
         return context
+
+
+class GroupOrderStatusView(GroupOrderOwnerMixin, View):
+    """US-08: creator advances the order forward (open → closed → ordered → arrived)."""
+
+    def get(self, request, pk):
+        return redirect("lupanes:grouporder-detail", pk=pk)
+
+    def post(self, request, pk):
+        order = self.get_group_order()
+        target = request.POST.get("status")
+        if order.can_advance_to(target):
+            order.status = target
+            if target == GroupOrder.Status.ARRIVED:
+                order.arrived_at = timezone.now()
+            order.save()
+            messages.success(request, "Estado del pedido actualizado.")
+        else:
+            messages.warning(request, "Ese cambio de estado no está permitido.")
+        return redirect("lupanes:grouporder-detail", pk=order.pk)
+
+
+class GroupOrderEditView(GroupOrderOwnerMixin, UpdateView):
+    """US-01/US-08: creator edits the order header and its products."""
+    model = GroupOrder
+    form_class = GroupOrderForm
+    template_name = "lupanes/grouporder_form.html"
+
+    def get_object(self, queryset=None):
+        return self.get_group_order()
+
+    def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        if "product_formset" not in context:
+            data = self.request.POST if self.request.method == "POST" else None
+            context["product_formset"] = GroupOrderProductFormSet(
+                data, instance=self.object, prefix="products",
+            )
+        return context
+
+    def form_valid(self, form):
+        formset = GroupOrderProductFormSet(
+            self.request.POST, instance=self.object, prefix="products",
+        )
+        if not formset.is_valid():
+            return self.form_invalid(form, product_formset=formset)
+        self.object = form.save()
+        formset.save()
+        messages.success(self.request, "Pedido actualizado.")
+        return redirect("lupanes:grouporder-detail", pk=self.object.pk)
+
+    def form_invalid(self, form, product_formset=None):
+        context = self.get_context_data(form=form)
+        if product_formset is not None:
+            context["product_formset"] = product_formset
+        return self.render_to_response(context)
