@@ -1,0 +1,63 @@
+{% extends "lupanes/base.html" %}
+
+{% block main %}
+<div class="d-flex justify-content-between align-items-start">
+  <div>
+    <h1>{{ object.title }}</h1>
+    <p class="text-muted mb-1">{{ object.producer_name }}</p>
+  </div>
+  <span class="badge bg-secondary align-self-center">{{ object.get_status_display }}</span>
+</div>
+
+<p class="mb-1"><i class="fa-regular fa-clock"></i>
+  Se cierra el {{ object.closing_date|date:"d/m/Y H:i" }}</p>
+{% if object.estimated_delivery_date %}
+<p class="small text-muted">Llegada estimada: {{ object.estimated_delivery_date|date:"d/m/Y" }}</p>
+{% endif %}
+{% if object.description %}<p>{{ object.description }}</p>{% endif %}
+
+{% if show_albaran_reminder %}
+<div class="alert alert-warning" role="alert">
+  <i class="fa-solid fa-receipt"></i>
+  El pago de este pedido se registra en tu albarán. Recuerda
+  <a href="{% url 'lupanes:deliverynote-new' %}">apuntar en tu albarán</a>
+  lo que has pedido (sólo lo que realmente recojas).
+</div>
+{% endif %}
+
+<h2 class="h5 mt-4">Productos</h2>
+<ul>
+  {% for product in object.products.all %}
+  <li>{{ product.name }}{% if product.price %} — {{ product.price }} €{% endif %}
+    {% if product.unit %} / {{ product.unit }}{% endif %}</li>
+  {% endfor %}
+</ul>
+
+{% if tally is not None %}
+<h2 class="h5 mt-4">Resumen del pedido (sólo tú lo ves)</h2>
+<div class="table-responsive">
+  <table class="table table-sm table-bordered">
+    <thead>
+      <tr>
+        <th>Nevera</th>
+        {% for product in tally.products %}<th>{{ product.name }}</th>{% endfor %}
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in tally.rows %}
+      <tr>
+        <td>{{ row.customer.username }}</td>
+        {% for qty in row.quantities %}<td>{{ qty|default_if_none:"" }}</td>{% endfor %}
+      </tr>
+      {% endfor %}
+    </tbody>
+    <tfoot>
+      <tr class="fw-bold">
+        <td>Total</td>
+        {% for total in tally.totals %}<td>{{ total }}</td>{% endfor %}
+      </tr>
+    </tfoot>
+  </table>
+</div>
+{% endif %}
+{% endblock main %}
