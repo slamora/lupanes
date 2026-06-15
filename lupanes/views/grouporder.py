@@ -53,6 +53,23 @@ def build_tally(order):
     }
 
 
+def order_view_context(order, user):
+    """Context shared by the order detail page and the submission flow."""
+    my_lines = (
+        GroupOrderLineItem.objects
+        .filter(product__group_order=order, customer=user)
+        .select_related("product")
+    )
+    is_creator = order.created_by_id == user.id
+    return {
+        "my_lines": my_lines,
+        "my_quantities": {li.product_id: li.quantity for li in my_lines},
+        "is_creator": is_creator,
+        "tally": build_tally(order) if is_creator else None,
+        "show_albaran_reminder": order.paid_in_albaranes and my_lines.exists(),
+    }
+
+
 class GroupOrderListView(CustomerAuthMixin, ListView):
     """US-02: board of currently-open orders (lazy-derived close)."""
     template_name = "lupanes/grouporder_list.html"
@@ -118,17 +135,5 @@ class GroupOrderDetailView(LoginRequiredMixin, DetailView):
 
     def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
         context = super().get_context_data(**kwargs)
-        order = self.object
-        user = self.request.user
-
-        my_lines = GroupOrderLineItem.objects.filter(
-            product__group_order=order, customer=user,
-        ).select_related("product")
-        context["my_lines"] = my_lines
-        context["my_quantities"] = {li.product_id: li.quantity for li in my_lines}
-
-        is_creator = order.created_by_id == user.id
-        context["is_creator"] = is_creator
-        context["tally"] = build_tally(order) if is_creator else None
-        context["show_albaran_reminder"] = order.paid_in_albaranes and my_lines.exists()
+        context.update(order_view_context(self.object, self.request.user))
         return context
