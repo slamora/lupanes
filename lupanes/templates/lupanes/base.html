@@ -55,6 +55,14 @@
               <a class="nav-link {% if url_name == 'product-list' %}active" aria-current="page"{% else %}"  {% endif %}
                 href="{% url 'lupanes:product-list' %}">Precios</a>
             </li>
+            <li class="nav-item">
+              <a class="nav-link {% if url_name == 'grouporder-list' %}active" aria-current="page"{% else %}" {% endif %}
+                href="{% url 'lupanes:grouporder-list' %}">Pedidos</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link {% if url_name == 'grouporder-mine' %}active" aria-current="page"{% else %}" {% endif %}
+                href="{% url 'lupanes:grouporder-mine' %}">Mis pedidos</a>
+            </li>
             {% endif %}
 
             {% if request.user.is_manager %}
