@@ -219,6 +219,10 @@ ADMINS = getaddresses([env('ADMINS', default='[]',)])
 
 MANAGERS = getaddresses([env('MANAGERS', default='[]',)])
 
+# Recipient for the group-order announcement email (D3). Defaults to the socios
+# mailing list so CI (which only has .env.example) passes without extra config.
+GROUP_ORDER_NOTIFY_EMAIL = env('GROUP_ORDER_NOTIFY_EMAIL', default='socios@lupierra.es')
+
 # Authentication
 LOGIN_URL = 'users:login'
 
