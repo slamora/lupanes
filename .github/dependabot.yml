@@ -1,0 +1,38 @@
+# To get started with Dependabot version updates, you'll need to specify which
+# package ecosystems to update and where the package manifests are located.
+# Please see the documentation for all configuration options:
+# https://docs.github.com/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
+
+version: 2
+updates:
+  # Maintain Python package dependencies (supports requirements.txt, Pipfile, pyproject.toml, etc.)
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "Europe/Madrid"
+
+    # Apply labels to generated pull requests for easier filtering
+    labels:
+      - "dependencies"
+
+    # Limit maximum number of open pull requests to avoid noise
+    open-pull-requests-limit: 5
+
+    # Ignore major framework updates to avoid breaking changes without manual review
+    ignore:
+      - dependency-name: "Django"
+        update-types: ["version-update:semver-major"]
+
+  # Maintain GitHub Actions workflow dependencies
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+      timezone: "Europe/Madrid"
+
+    labels:
+      - "dependencies"
+      - "ci"
