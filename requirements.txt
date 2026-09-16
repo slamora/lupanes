@@ -1,5 +1,5 @@
 django==4.2.30
-django-bootstrap5==24.3
+django-bootstrap5==26.3
 django-environ
 django-extensions
 django-post_office==3.11.3
