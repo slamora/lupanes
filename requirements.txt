@@ -4,6 +4,6 @@ django-environ
 django-extensions
 django-post_office==3.8.0
 django-pwa
-dj_database_url==3.0.1
+dj_database_url==3.1.2
 psycopg2-binary==2.9.10
 gspread==6.2.1
