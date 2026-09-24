@@ -2,8 +2,8 @@ django==5.2.16
 django-bootstrap5==24.3
 django-environ
 django-extensions
-django-post_office==3.8.0
+django-post_office==3.11.3
 django-pwa
-dj_database_url==3.0.1
-psycopg2-binary==2.9.10
+dj_database_url==3.1.2
+psycopg2-binary==2.9.13
 gspread==6.2.1

@@ -1,2 +1,2 @@
 gunicorn
-sentry-sdk==2.52.0
+sentry-sdk==2.69.1
