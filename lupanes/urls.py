@@ -28,6 +28,14 @@ urlpatterns = [
          name='deliverynote-delete-bulk'),
     path('albaranes/por-producto/', views.ProductSummaryView.as_view(), name='product-summary'),
 
+    path('pedidos/', views.GroupOrderListView.as_view(), name='grouporder-list'),
+    path('pedidos/nuevo/', views.GroupOrderCreateView.as_view(), name='grouporder-new'),
+    path('mis-pedidos/', views.GroupOrderMineView.as_view(), name='grouporder-mine'),
+    path('pedidos/<int:pk>/', views.GroupOrderDetailView.as_view(), name='grouporder-detail'),
+    path('pedidos/<int:pk>/editar/', views.GroupOrderEditView.as_view(), name='grouporder-edit'),
+    path('pedidos/<int:pk>/participar/', views.GroupOrderSubmitView.as_view(), name='grouporder-submit'),
+    path('pedidos/<int:pk>/estado/', views.GroupOrderStatusView.as_view(), name='grouporder-status'),
+
     path('neveras/', views.CustomerListView.as_view(), name='customer-list'),
 
     path('product/<int:pk>/', views.ProductAjaxView.as_view(), name='product-detail'),

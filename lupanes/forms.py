@@ -1,11 +1,44 @@
 from django import forms
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
+from django.forms import inlineformset_factory
 
-from lupanes.models import DeliveryNote, Producer, Product, ProductPrice
+from lupanes.models import (DeliveryNote, GroupOrder, GroupOrderProduct,
+                            Producer, Product, ProductPrice)
 from django.db.models.functions import Lower
 
 User = get_user_model()
+
+
+class GroupOrderForm(forms.ModelForm):
+    """Organizer form to open a group order (header fields; products via formset)."""
+    paid_in_albaranes = forms.BooleanField(
+        required=False, label="El pago lo registra cada socio en albaranes",
+    )
+
+    class Meta:
+        model = GroupOrder
+        fields = [
+            "title", "producer_name", "description",
+            "closing_date", "estimated_delivery_date", "paid_in_albaranes",
+        ]
+        widgets = {
+            "closing_date": forms.DateTimeInput(
+                attrs={"type": "datetime-local", "class": "form-control"},
+                format="%Y-%m-%dT%H:%M",
+            ),
+            "estimated_delivery_date": forms.DateInput(
+                attrs={"type": "date", "class": "form-control"}, format="%Y-%m-%d",
+            ),
+            "description": forms.Textarea(attrs={"rows": 2}),
+        }
+
+
+GroupOrderProductFormSet = inlineformset_factory(
+    GroupOrder, GroupOrderProduct,
+    fields=["name", "price", "unit"],
+    extra=3, min_num=1, validate_min=True, can_delete=True,
+)
 
 
 class DeliveryNoteCreateForm(forms.ModelForm):

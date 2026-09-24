@@ -1,0 +1,14 @@
+Hola Lupierris,
+
+Se abre pedido de {{ order.producer_name }}: {{ order.title }}.
+{% if order.description %}
+{{ order.description }}
+{% endif %}
+Productos:
+{% for p in order.products.all %}- {{ p.name }}{% if p.price %} ({{ p.price }} €){% endif %}{% if p.unit %} / {{ p.unit }}{% endif %}
+{% endfor %}
+El pedido puede realizarse hasta el {{ order.closing_date|date:"d/m/Y H:i" }}.
+{% if order.estimated_delivery_date %}Llegada estimada: {{ order.estimated_delivery_date|date:"d/m/Y" }}.{% endif %}
+{% if order.paid_in_albaranes %}
+El pago de este pedido se registra en albaranes por cada socio.
+{% endif %}

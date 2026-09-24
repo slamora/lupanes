@@ -1,0 +1,41 @@
+{% extends "lupanes/base.html" %}
+
+{% block main %}
+<h1>Mis pedidos</h1>
+
+{% if order_items %}
+{% for item in order_items %}
+<div class="card mb-3">
+  <div class="card-body">
+    <div class="d-flex justify-content-between align-items-start">
+      <h5 class="card-title">
+        <a href="{% url 'lupanes:grouporder-detail' item.order.pk %}">{{ item.order.title }}</a>
+      </h5>
+      <span class="badge bg-secondary">{{ item.order.get_status_display }}</span>
+    </div>
+    <h6 class="card-subtitle mb-2 text-muted">{{ item.order.producer_name }}</h6>
+
+    {% if item.show_albaran_reminder %}
+    <div class="alert alert-warning py-2" role="alert">
+      <i class="fa-solid fa-receipt"></i>
+      El pago se registra en tu albarán. Recuerda
+      <a href="{% url 'lupanes:deliverynote-new' %}">apuntar en tu albarán</a>
+      lo que recojas de este pedido.
+    </div>
+    {% endif %}
+
+    <ul class="mb-0">
+      {% for line in item.lines %}
+      <li>{{ line.product.name }}: <strong>{{ line.quantity }}</strong></li>
+      {% endfor %}
+    </ul>
+  </div>
+</div>
+{% endfor %}
+{% else %}
+<div class="alert alert-info" role="alert">
+  Todavía no has pedido nada. Pásate por el
+  <a href="{% url 'lupanes:grouporder-list' %}">tablón de pedidos</a> para ver qué hay abierto.
+</div>
+{% endif %}
+{% endblock main %}

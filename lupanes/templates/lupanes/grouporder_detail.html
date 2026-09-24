@@ -1,0 +1,110 @@
+{% extends "lupanes/base.html" %}
+
+{% block main %}
+<div class="d-flex justify-content-between align-items-start">
+  <div>
+    <h1>{{ object.title }}</h1>
+    <p class="text-muted mb-1">{{ object.producer_name }}</p>
+  </div>
+  <span class="badge bg-secondary align-self-center">{{ object.get_status_display }}</span>
+</div>
+
+{% if submit_error %}
+<div class="alert alert-warning" role="alert">{{ submit_error }}</div>
+{% endif %}
+
+<p class="mb-1"><i class="fa-regular fa-clock"></i>
+  Se cierra el {{ object.closing_date|date:"d/m/Y H:i" }}</p>
+{% if object.estimated_delivery_date %}
+<p class="small text-muted">Llegada estimada: {{ object.estimated_delivery_date|date:"d/m/Y" }}</p>
+{% endif %}
+{% if object.description %}<p>{{ object.description }}</p>{% endif %}
+
+{% if is_creator %}
+<div class="card mb-3">
+  <div class="card-body">
+    <div class="d-flex justify-content-between align-items-center">
+      <h2 class="h6 mb-0">Gestión del pedido</h2>
+      <a class="btn btn-sm btn-outline-secondary" href="{% url 'lupanes:grouporder-edit' object.pk %}">
+        <i class="fa-solid fa-pen"></i> Editar</a>
+    </div>
+    <form method="post" action="{% url 'lupanes:grouporder-status' object.pk %}"
+      class="mt-2 d-flex gap-2 flex-wrap">
+      {% csrf_token %}
+      <button name="status" value="closed" class="btn btn-sm btn-outline-primary">Cerrar pedido</button>
+      <button name="status" value="ordered" class="btn btn-sm btn-outline-primary">Marcar como pedido</button>
+      <button name="status" value="arrived" class="btn btn-sm btn-outline-success">Marcar como recibido</button>
+    </form>
+  </div>
+</div>
+{% endif %}
+
+{% if show_albaran_reminder %}
+<div class="alert alert-warning" role="alert">
+  <i class="fa-solid fa-receipt"></i>
+  El pago de este pedido se registra en tu albarán. Recuerda
+  <a href="{% url 'lupanes:deliverynote-new' %}">apuntar en tu albarán</a>
+  lo que has pedido (sólo lo que realmente recojas).
+</div>
+{% endif %}
+
+<h2 class="h5 mt-4">Productos</h2>
+{% if object.is_open %}
+<form method="post" action="{% url 'lupanes:grouporder-submit' object.pk %}">
+  {% csrf_token %}
+  <table class="table table-sm align-middle">
+    <thead>
+      <tr><th>Producto</th><th>Precio</th><th>Tu cantidad</th></tr>
+    </thead>
+    <tbody>
+      {% for row in product_rows %}
+      <tr>
+        <td>{{ row.product.name }}{% if row.product.unit %} / {{ row.product.unit }}{% endif %}</td>
+        <td>{% if row.product.price %}{{ row.product.price }} €{% endif %}</td>
+        <td>
+          <input type="number" step="0.01" min="0" class="form-control form-control-sm"
+            name="product_{{ row.product.pk }}" value="{{ row.my_qty|default_if_none:'' }}">
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <button type="submit" class="btn btn-success">Guardar mi pedido</button>
+</form>
+{% else %}
+<ul>
+  {% for row in product_rows %}
+  <li>{{ row.product.name }}{% if row.product.price %} — {{ row.product.price }} €{% endif %}
+    {% if row.my_qty is not None %} <strong>(tu cantidad: {{ row.my_qty }})</strong>{% endif %}</li>
+  {% endfor %}
+</ul>
+{% endif %}
+
+{% if tally is not None %}
+<h2 class="h5 mt-4">Resumen del pedido (sólo tú lo ves)</h2>
+<div class="table-responsive">
+  <table class="table table-sm table-bordered">
+    <thead>
+      <tr>
+        <th>Nevera</th>
+        {% for product in tally.products %}<th>{{ product.name }}</th>{% endfor %}
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in tally.rows %}
+      <tr>
+        <td>{{ row.customer.username }}</td>
+        {% for qty in row.quantities %}<td>{{ qty|default_if_none:"" }}</td>{% endfor %}
+      </tr>
+      {% endfor %}
+    </tbody>
+    <tfoot>
+      <tr class="fw-bold">
+        <td>Total</td>
+        {% for total in tally.totals %}<td>{{ total }}</td>{% endfor %}
+      </tr>
+    </tfoot>
+  </table>
+</div>
+{% endif %}
+{% endblock main %}

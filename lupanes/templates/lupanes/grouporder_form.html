@@ -1,0 +1,40 @@
+{% extends "lupanes/base.html" %}
+{% load django_bootstrap5 %}
+
+{% block main %}
+<h1>{% if object %}Editar pedido{% else %}Abrir un pedido{% endif %}</h1>
+
+<form method="post" class="mt-3">
+  {% csrf_token %}
+  {% bootstrap_form form %}
+
+  <h2 class="h5 mt-4">Productos</h2>
+  <p class="text-muted small">Añade al menos un producto. El precio es opcional.</p>
+  {{ product_formset.management_form }}
+  <div class="table-responsive">
+    <table class="table table-sm align-middle">
+      <thead>
+        <tr><th>Producto</th><th>Precio (€)</th><th>Unidad</th>
+          {% if product_formset.can_delete %}<th>Quitar</th>{% endif %}</tr>
+      </thead>
+      <tbody>
+        {% for pform in product_formset %}
+        {{ pform.id }}
+        <tr>
+          <td>{{ pform.name }}</td>
+          <td>{{ pform.price }}</td>
+          <td>{{ pform.unit }}</td>
+          {% if product_formset.can_delete %}<td>{{ pform.DELETE }}</td>{% endif %}
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% if product_formset.non_form_errors %}
+  <div class="alert alert-danger">{{ product_formset.non_form_errors }}</div>
+  {% endif %}
+
+  <button type="submit" class="btn btn-success">Abrir pedido</button>
+  <a class="btn btn-outline-secondary" href="{% url 'lupanes:grouporder-list' %}">Cancelar</a>
+</form>
+{% endblock main %}
