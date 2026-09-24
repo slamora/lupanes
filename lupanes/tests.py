@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, timezone as datetime_timezone
 from decimal import Decimal
 from unittest.mock import MagicMock, patch
 
@@ -487,36 +487,36 @@ class ProductSummaryTestMixin:
         cls.note1 = DeliveryNote.objects.create(
             customer=cls.customer1, product=cls.manzana,
             quantity=Decimal("2.500"),
-            date=timezone.datetime(2026, 3, 31, 10, 0, tzinfo=timezone.utc),
+            date=timezone.datetime(2026, 3, 31, 10, 0, tzinfo=datetime_timezone.utc),
         )
         cls.note2 = DeliveryNote.objects.create(
             customer=cls.customer2, product=cls.manzana,
             quantity=Decimal("3.000"),
-            date=timezone.datetime(2026, 3, 31, 11, 0, tzinfo=timezone.utc),
+            date=timezone.datetime(2026, 3, 31, 11, 0, tzinfo=datetime_timezone.utc),
         )
         cls.note3 = DeliveryNote.objects.create(
             customer=cls.customer1, product=cls.aguacate,
             quantity=Decimal("1.000"),
-            date=timezone.datetime(2026, 3, 31, 10, 0, tzinfo=timezone.utc),
+            date=timezone.datetime(2026, 3, 31, 10, 0, tzinfo=datetime_timezone.utc),
         )
 
         # Delivery notes for April 1
         cls.note4 = DeliveryNote.objects.create(
             customer=cls.customer2, product=cls.manzana,
             quantity=Decimal("1.500"),
-            date=timezone.datetime(2026, 4, 1, 9, 0, tzinfo=timezone.utc),
+            date=timezone.datetime(2026, 4, 1, 9, 0, tzinfo=datetime_timezone.utc),
         )
         cls.note5 = DeliveryNote.objects.create(
             customer=cls.customer2, product=cls.aguacate,
             quantity=Decimal("0.500"),
-            date=timezone.datetime(2026, 4, 1, 9, 0, tzinfo=timezone.utc),
+            date=timezone.datetime(2026, 4, 1, 9, 0, tzinfo=datetime_timezone.utc),
         )
 
         # Delivery note for Pan (different producer)
         cls.note6 = DeliveryNote.objects.create(
             customer=cls.customer1, product=cls.pan,
             quantity=Decimal("2"),
-            date=timezone.datetime(2026, 3, 31, 10, 0, tzinfo=timezone.utc),
+            date=timezone.datetime(2026, 3, 31, 10, 0, tzinfo=datetime_timezone.utc),
         )
 
         cls.url = reverse("lupanes:product-summary")
