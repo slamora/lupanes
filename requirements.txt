@@ -1,4 +1,4 @@
-django==5.2.16
+django==5.2.17
 django-bootstrap5==26.3
 django-environ
 django-extensions
