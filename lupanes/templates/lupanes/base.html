@@ -109,9 +109,12 @@
                   </a>
                 </li>
                 <li>
-                  <a class="dropdown-item" href="{% url 'users:logout' %}">
-                    <i class="fa-solid fa-arrow-right-from-bracket me-2"></i> Salir
-                  </a>
+                  <form action="{% url 'users:logout' %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="dropdown-item">
+                      <i class="fa-solid fa-arrow-right-from-bracket me-2"></i> Salir
+                    </button>
+                  </form>
                 </li>
               </ul>
             </li>
