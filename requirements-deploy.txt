@@ -1,2 +1,3 @@
+gevent
 gunicorn
 sentry-sdk==2.72.0
