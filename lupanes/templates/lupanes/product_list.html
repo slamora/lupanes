@@ -12,16 +12,50 @@
   </div>
 </div>
 
+<h3>Filtrar productos</h3>
 <form method="get" class="row g-2 align-items-end mb-3">
-  <div class="col-12 col-md-6 col-lg-4">
+  <div class="col-12 col-md-6 col-lg-3">
     <label for="id_q" class="form-label">Buscar por nombre</label>
     <input type="text" id="id_q" name="q" class="form-control" value="{{ search_query }}"
       placeholder="Ej: Aceite">
   </div>
-  <div class="col-auto">
-    <button type="submit" class="btn btn-success">Buscar</button>
+  <div class="col-12 col-md-6 col-lg-3">
+    <label for="id_producer" class="form-label">Productor</label>
+    <select id="id_producer" name="producer" class="form-select">
+      <option value="">Todos</option>
+      {% for producer in producers %}
+      <option value="{{ producer.pk }}" {% if selected_producer == producer.pk|stringformat:"s" %}selected{% endif %}>
+        {{ producer.name }}
+      </option>
+      {% endfor %}
+    </select>
   </div>
-  {% if search_query %}
+  <div class="col-12 col-md-6 col-lg-2">
+    <label for="id_unit" class="form-label">Unidad</label>
+    <select id="id_unit" name="unit" class="form-select">
+      <option value="">Todas</option>
+      {% for value, label in unit_choices %}
+      <option value="{{ value }}" {% if selected_unit == value %}selected{% endif %}>{{ label }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  {% if can_filter_status %}
+  <div class="col-12 col-md-6 col-lg-2">
+    <label for="id_is_active" class="form-label">Estado</label>
+    <select id="id_is_active" name="is_active" class="form-select">
+      <option value="">Todos</option>
+      <option value="1" {% if selected_active == "1" %}selected{% endif %}>Activo</option>
+      <option value="0" {% if selected_active == "0" %}selected{% endif %}>Inactivo</option>
+    </select>
+  </div>
+  {% endif %}
+  {% if selected_sort != "name" %}
+  <input type="hidden" name="sort" value="{{ selected_sort }}">
+  {% endif %}
+  <div class="col-auto">
+    <button type="submit" class="btn btn-success">Filtrar</button>
+  </div>
+  {% if search_query or selected_producer or selected_unit or selected_active %}
   <div class="col-auto">
     <a href="{% url 'lupanes:product-list' %}" class="btn btn-outline-secondary">Limpiar</a>
   </div>
@@ -33,12 +67,28 @@
     <thead>
       <tr>
         <th>#</th>
-        <th>Nombre</th>
-        <th>Productor</th>
-        <th>Unidad</th>
+        <th>
+          <a href="{% if selected_sort == 'name' %}{{ sort_urls.name_desc }}{% else %}{{ sort_urls.name }}{% endif %}">
+            Nombre{% if selected_sort == "name" %} ▲{% elif selected_sort == "-name" %} ▼{% endif %}
+          </a>
+        </th>
+        <th>
+          <a href="{% if selected_sort == 'producer' %}{{ sort_urls.producer_desc }}{% else %}{{ sort_urls.producer }}{% endif %}">
+            Productor{% if selected_sort == "producer" %} ▲{% elif selected_sort == "-producer" %} ▼{% endif %}
+          </a>
+        </th>
+        <th>
+          <a href="{% if selected_sort == 'unit' %}{{ sort_urls.unit_desc }}{% else %}{{ sort_urls.unit }}{% endif %}">
+            Unidad{% if selected_sort == "unit" %} ▲{% elif selected_sort == "-unit" %} ▼{% endif %}
+          </a>
+        </th>
         <th>Precio (actual)</th>
         {% if request.user.is_manager %}
-        <th>¿Activo?</th>
+        <th>
+          <a href="{% if selected_sort == 'is_active' %}{{ sort_urls.is_active_desc }}{% else %}{{ sort_urls.is_active }}{% endif %}">
+            ¿Activo?{% if selected_sort == "is_active" %} ▲{% elif selected_sort == "-is_active" %} ▼{% endif %}
+          </a>
+        </th>
         {% endif %}
       </tr>
     </thead>

@@ -5,14 +5,14 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models.functions import Lower
 from django.db.models.query import QuerySet
 from django.forms.models import BaseModelForm
-from django.http import (HttpRequest, HttpResponse, HttpResponseRedirect,
-                         JsonResponse)
+from django.http import HttpRequest, HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from django.views.generic import CreateView, DetailView, ListView, UpdateView
 
+from lupanes.filters import ProductFilter
 from lupanes.forms import ProductForm, ProductPriceForm
-from lupanes.models import Product
+from lupanes.models import Producer, Product
 from lupanes.users.mixins import CustomerAuthMixin, ManagerAuthMixin
 
 
@@ -28,7 +28,7 @@ class ProductAjaxView(CustomerAuthMixin, DetailView):
             "unit": {
                 "name": obj.unit,
                 "accept_decimals": obj.unit_accept_decimals(),
-            }
+            },
         }
         return JsonResponse(data=data)
 
@@ -36,16 +36,33 @@ class ProductAjaxView(CustomerAuthMixin, DetailView):
 class ProductListView(LoginRequiredMixin, ListView):
     model = Product
 
-    def get_queryset(self) -> QuerySet[Any]:
-        queryset = self.model.objects.all().order_by(Lower('name'))
-        query = self.request.GET.get("q", "").strip()
-        if query:
-            queryset = queryset.filter(name__icontains=query)
-        return queryset
+    def get_filter(self) -> ProductFilter:
+        if not hasattr(self, "_filter"):
+            self._filter = ProductFilter(self.request.GET, self.request.user)
+        return self._filter
+
+    def get_queryset(self) -> QuerySet[Product]:
+        return self.get_filter().filter_queryset(super().get_queryset())
 
     def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
         context = super().get_context_data(**kwargs)
-        context["search_query"] = self.request.GET.get("q", "").strip()
+        filter_obj = self.get_filter()
+
+        context.update(
+            {
+                "search_query": filter_obj.search_query,
+                "producers": Producer.objects.filter(
+                    pk__in=filter_obj.visible_producer_ids
+                ).order_by(Lower("name")),
+                "selected_producer": filter_obj.selected_producer,
+                "selected_unit": filter_obj.selected_unit,
+                "selected_active": filter_obj.selected_active,
+                "selected_sort": filter_obj.selected_sort,
+                "sort_urls": filter_obj.get_sort_urls(),
+                "unit_choices": Product.Unit.choices,
+                "can_filter_status": filter_obj.can_filter_status,
+            }
+        )
         return context
 
 
@@ -55,7 +72,10 @@ class ProductCreateView(ManagerAuthMixin, CreateView):
     template_name = "lupanes/product_create.html"
 
     def get_success_url(self) -> str:
-        messages.info(self.request, "Para continuar la creación del producto, introduce su precio.")
+        messages.info(
+            self.request,
+            "Para continuar la creación del producto, introduce su precio.",
+        )
         return reverse("lupanes:product-edit", args=(self.object.pk,))
 
 
