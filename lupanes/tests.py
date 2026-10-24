@@ -11,7 +11,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
 from django.core.cache import cache
 from django.core.management import call_command
-from django.test import TestCase
+from django.test import RequestFactory, TestCase
 from django.urls import reverse
 from django.utils import timezone
 from gspread.exceptions import APIError
@@ -19,8 +19,9 @@ from gspread.exceptions import APIError
 import lupanes.utils
 from lupanes.exceptions import RetryExhausted
 from lupanes.models import DeliveryNote, Producer, Product, ProductPrice
-from lupanes.users import CUSTOMERS_GROUP
+from lupanes.users import CUSTOMERS_GROUP, MANAGERS_GROUP
 from lupanes.utils import _get_nevera_cache_key, search_nevera_balance
+from lupanes.views.product import ProductListView
 
 User = get_user_model()
 
@@ -743,6 +744,14 @@ class ProductListViewSearchTest(TestCase):
     def _product_names(self, response):
         return [product.name for product in response.context["object_list"]]
 
+    def _query_products(self, params=None):
+        request = RequestFactory().get(self.url, params or {})
+        request.user = self.user
+        view = ProductListView()
+        view.setup(request)
+        queryset = view.get_queryset()
+        return list(queryset), view.get_context_data(object_list=queryset)
+
     def test_filters_by_name_with_q_param(self):
         response = self.client.get(self.url, {"q": "acei"})
         self.assertEqual(response.status_code, 200)
@@ -758,13 +767,68 @@ class ProductListViewSearchTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
             self._product_names(response),
-            ["Aceite de oliva", "Arroz integral", "Zumo de manzana"],
+            ["Aceite de oliva", "Arroz integral"],
         )
 
     def test_preserves_search_query_in_context(self):
         response = self.client.get(self.url, {"q": "   aceite   "})
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context["search_query"], "aceite")
+
+    def test_filters_by_unit(self):
+        products, _context = self._query_products({"unit": Product.Unit.KG})
+        self.assertEqual([product.name for product in products], ["Arroz integral"])
+
+    def test_filters_by_producer(self):
+        producer = Producer.objects.create(name="Otro productor")
+        product = Product.objects.create(
+            name="Miel",
+            producer=producer,
+            unit=Product.Unit.BOTE,
+        )
+        ProductPrice.objects.create(product=product, value=Decimal("2.00"), start_date=date(2026, 1, 1))
+
+        products, _context = self._query_products({"producer": producer.pk})
+
+        self.assertEqual([product.name for product in products], ["Miel"])
+
+    def test_sorts_by_name_descending(self):
+        products, _context = self._query_products({"sort": "-name"})
+        self.assertEqual([product.name for product in products], ["Arroz integral", "Aceite de oliva"])
+
+    def test_manager_can_filter_inactive_products(self):
+        managers = Group.objects.create(name=MANAGERS_GROUP)
+        self.user.groups.add(managers)
+
+        products, context = self._query_products({"is_active": "0"})
+
+        self.assertEqual([product.name for product in products], ["Zumo de manzana"])
+        self.assertTrue(context["can_filter_status"])
+
+    def test_customer_cannot_list_inactive_products(self):
+        products, _context = self._query_products({"is_active": "0"})
+
+        self.assertEqual([product.name for product in products], ["Aceite de oliva", "Arroz integral"])
+
+    def test_sort_links_preserve_current_filters(self):
+        _products, context = self._query_products({
+            "q": "aceite",
+            "unit": Product.Unit.LITRO,
+        })
+
+        self.assertIn("q=aceite", context["sort_urls"]["name_desc"])
+        self.assertIn("unit=litro", context["sort_urls"]["name_desc"])
+        self.assertIn("sort=-name", context["sort_urls"]["name_desc"])
+
+    def test_invalid_filter_and_sort_values_are_ignored(self):
+        products, context = self._query_products({
+            "unit": "invalid",
+            "sort": "__class__",
+        })
+
+        self.assertEqual([product.name for product in products], ["Aceite de oliva", "Arroz integral"])
+        self.assertEqual(context["selected_unit"], "")
+        self.assertEqual(context["selected_sort"], "name")
 
 
 class UpdateProductsCommandTest(TestCase):
