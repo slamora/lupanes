@@ -1,12 +1,17 @@
+import csv
 from datetime import date, timezone as datetime_timezone
 from decimal import Decimal
+import io
+import os
+import tempfile
 from unittest.mock import MagicMock, patch
 
 import requests.exceptions
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
 from django.core.cache import cache
-from django.test import TestCase
+from django.core.management import call_command
+from django.test import RequestFactory, TestCase
 from django.urls import reverse
 from django.utils import timezone
 from gspread.exceptions import APIError
@@ -14,8 +19,9 @@ from gspread.exceptions import APIError
 import lupanes.utils
 from lupanes.exceptions import RetryExhausted
 from lupanes.models import DeliveryNote, Producer, Product, ProductPrice
-from lupanes.users import CUSTOMERS_GROUP
+from lupanes.users import CUSTOMERS_GROUP, MANAGERS_GROUP
 from lupanes.utils import _get_nevera_cache_key, search_nevera_balance
+from lupanes.views.product import ProductListView
 
 User = get_user_model()
 
@@ -738,6 +744,14 @@ class ProductListViewSearchTest(TestCase):
     def _product_names(self, response):
         return [product.name for product in response.context["object_list"]]
 
+    def _query_products(self, params=None):
+        request = RequestFactory().get(self.url, params or {})
+        request.user = self.user
+        view = ProductListView()
+        view.setup(request)
+        queryset = view.get_queryset()
+        return list(queryset), view.get_context_data(object_list=queryset)
+
     def test_filters_by_name_with_q_param(self):
         response = self.client.get(self.url, {"q": "acei"})
         self.assertEqual(response.status_code, 200)
@@ -753,10 +767,196 @@ class ProductListViewSearchTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
             self._product_names(response),
-            ["Aceite de oliva", "Arroz integral", "Zumo de manzana"],
+            ["Aceite de oliva", "Arroz integral"],
         )
 
     def test_preserves_search_query_in_context(self):
         response = self.client.get(self.url, {"q": "   aceite   "})
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context["search_query"], "aceite")
+
+    def test_filters_by_unit(self):
+        products, _context = self._query_products({"unit": Product.Unit.KG})
+        self.assertEqual([product.name for product in products], ["Arroz integral"])
+
+    def test_filters_by_producer(self):
+        producer = Producer.objects.create(name="Otro productor")
+        product = Product.objects.create(
+            name="Miel",
+            producer=producer,
+            unit=Product.Unit.BOTE,
+        )
+        ProductPrice.objects.create(product=product, value=Decimal("2.00"), start_date=date(2026, 1, 1))
+
+        products, _context = self._query_products({"producer": producer.pk})
+
+        self.assertEqual([product.name for product in products], ["Miel"])
+
+    def test_sorts_by_name_descending(self):
+        products, _context = self._query_products({"sort": "-name"})
+        self.assertEqual([product.name for product in products], ["Arroz integral", "Aceite de oliva"])
+
+    def test_manager_can_filter_inactive_products(self):
+        managers = Group.objects.create(name=MANAGERS_GROUP)
+        self.user.groups.add(managers)
+
+        products, context = self._query_products({"is_active": "0"})
+
+        self.assertEqual([product.name for product in products], ["Zumo de manzana"])
+        self.assertTrue(context["can_filter_status"])
+
+    def test_customer_cannot_list_inactive_products(self):
+        products, _context = self._query_products({"is_active": "0"})
+
+        self.assertEqual([product.name for product in products], ["Aceite de oliva", "Arroz integral"])
+
+    def test_sort_links_preserve_current_filters(self):
+        _products, context = self._query_products({
+            "q": "aceite",
+            "unit": Product.Unit.LITRO,
+        })
+
+        self.assertIn("q=aceite", context["sort_urls"]["name_desc"])
+        self.assertIn("unit=litro", context["sort_urls"]["name_desc"])
+        self.assertIn("sort=-name", context["sort_urls"]["name_desc"])
+
+    def test_invalid_filter_and_sort_values_are_ignored(self):
+        products, context = self._query_products({
+            "unit": "invalid",
+            "sort": "__class__",
+        })
+
+        self.assertEqual([product.name for product in products], ["Aceite de oliva", "Arroz integral"])
+        self.assertEqual(context["selected_unit"], "")
+        self.assertEqual(context["selected_sort"], "name")
+
+
+class UpdateProductsCommandTest(TestCase):
+    csv_fields = [
+        "id",
+        "name",
+        "description",
+        "producer_id",
+        "producer__name",
+        "unit",
+        "is_active",
+    ]
+
+    def setUp(self):
+        self.producer = Producer.objects.create(name="Original Producer")
+        self.new_producer = Producer.objects.create(name="New Producer")
+        self.product = Product.objects.create(
+            name="Original Product",
+            description="Original description",
+            producer=self.producer,
+            unit=Product.Unit.KG,
+            is_active=True,
+        )
+        self.second_product = Product.objects.create(
+            name="Second Product",
+            description="Second description",
+            producer=self.producer,
+            unit=Product.Unit.KG,
+            is_active=True,
+        )
+
+    def run_update_command(self, rows, dry_run=False):
+        output = io.StringIO()
+        errors = io.StringIO()
+        with tempfile.TemporaryDirectory() as directory:
+            input_path = os.path.join(directory, "products.csv")
+            with open(input_path, "w", newline="", encoding="utf-8") as csv_file:
+                writer = csv.DictWriter(csv_file, fieldnames=self.csv_fields)
+                writer.writeheader()
+                writer.writerows(rows)
+
+            command_args = [input_path]
+            if dry_run:
+                command_args.append("--dry-run")
+            call_command("updateproducts", *command_args, stdout=output, stderr=errors)
+        return output.getvalue(), errors.getvalue()
+
+    def product_row(self, **overrides):
+        row = {
+            "id": self.product.pk,
+            "name": "Updated Product",
+            "description": "Updated description",
+            "producer_id": self.new_producer.pk,
+            "producer__name": self.new_producer.name,
+            "unit": Product.Unit.BOTELLA,
+            "is_active": "no",
+        }
+        row.update(overrides)
+        return row
+
+    def test_dry_run_prints_field_changes_without_updating_product(self):
+        output, errors = self.run_update_command([self.product_row()], dry_run=True)
+
+        self.product.refresh_from_db()
+        self.assertEqual(self.product.name, "Original Product")
+        self.assertEqual(self.product.description, "Original description")
+        self.assertEqual(self.product.producer, self.producer)
+        self.assertEqual(self.product.unit, Product.Unit.KG)
+        self.assertTrue(self.product.is_active)
+        self.assertIn("name: 'Original Product' -> 'Updated Product'", output)
+        self.assertIn("description: 'Original description' -> 'Updated description'", output)
+        self.assertIn("producer: 'Original Producer' -> 'New Producer'", output)
+        self.assertIn("Dry run: no changes made.", output)
+        self.assertEqual(errors, "")
+
+    def test_updates_product_fields_from_export_csv(self):
+        output, errors = self.run_update_command([self.product_row()])
+
+        self.product.refresh_from_db()
+        self.assertEqual(self.product.name, "Updated Product")
+        self.assertEqual(self.product.description, "Updated description")
+        self.assertEqual(self.product.producer, self.new_producer)
+        self.assertEqual(self.product.unit, Product.Unit.BOTELLA)
+        self.assertFalse(self.product.is_active)
+        self.assertIn("Updated 1 product.", output)
+        self.assertEqual(errors, "")
+
+    def test_unchanged_product_is_reported_without_saving(self):
+        output, errors = self.run_update_command([
+            self.product_row(
+                name=self.product.name,
+                description=self.product.description,
+                producer_id=self.producer.pk,
+                producer__name=self.producer.name,
+                unit=self.product.unit,
+                is_active="sí",
+            ),
+        ])
+
+        self.assertIn(f"Product {self.product.pk} (Original Product):", output)
+        self.assertIn("no changes.", output)
+        self.assertIn("Updated 0 products.", output)
+        self.assertEqual(errors, "")
+
+    def test_invalid_row_is_reported_and_later_products_are_updated(self):
+        second_row = self.product_row(id=self.second_product.pk, name="Updated Second Product")
+        output, errors = self.run_update_command([
+            self.product_row(),
+            self.product_row(id="not-an-id"),
+            second_row,
+        ])
+
+        self.product.refresh_from_db()
+        self.second_product.refresh_from_db()
+        self.assertEqual(self.product.name, "Updated Product")
+        self.assertEqual(self.second_product.name, "Updated Second Product")
+        self.assertIn("Row 3: invalid product id 'not-an-id'.", errors)
+        self.assertIn("Updated 2 products.", output)
+
+    def test_database_error_is_reported_and_later_products_are_updated(self):
+        conflicting_row = self.product_row(name=self.second_product.name)
+        second_row = self.product_row(id=self.second_product.pk, name="Updated Second Product")
+        output, errors = self.run_update_command([conflicting_row, second_row])
+
+        self.product.refresh_from_db()
+        self.second_product.refresh_from_db()
+        self.assertEqual(self.product.name, "Original Product")
+        self.assertEqual(self.second_product.name, "Updated Second Product")
+        self.assertIn(f"could not update product {self.product.pk}", errors)
+        self.assertIn("Skipped 1 row due to errors.", errors)
+        self.assertIn("Updated 1 product.", output)
