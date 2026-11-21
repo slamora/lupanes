@@ -59,6 +59,19 @@ Schedule management command to send emails regularly via cron:
 ```
 More configuration options on [django-post-office](https://github.com/ui/django-post_office).
 
+## Actualizar productos desde un CSV
+El comando `updateproducts` actualiza productos existentes usando el CSV generado por
+`scripts/export_products_and_producers_csv.py`. Primero se puede revisar el resultado sin
+guardar cambios:
+
+```sh
+python manage.py updateproducts --dry-run products.csv
+python manage.py updateproducts products.csv
+```
+
+El comando identifica cada producto por su columna `id`; no crea productos nuevos.
+Si una fila no se puede validar o actualizar, muestra el error y continúa con las
+siguientes filas. Los errores aparecen en la salida de error y se resumen al final.
 
 ## Configure database backups
 You can take advantage of scripts located on `/scripts` to automatize your database backups.
