@@ -26,3 +26,5 @@ services:
         value: "*.onrender.com"
       - key: STATIC_ROOT
         value: /opt/render/project/src/staticfiles
+      - key: MEDIA_ROOT
+        value: /opt/render/project/src/mediafiles
