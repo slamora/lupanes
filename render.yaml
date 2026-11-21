@@ -23,4 +23,6 @@ services:
       - key: WEB_CONCURRENCY
         value: 4
       - key: ALLOWED_HOSTS
-        value: ".albaranes.onrender.com"
+        value: "*.onrender.com"
+      - key: STATIC_ROOT
+        value: /opt/render/project/src/staticfiles
