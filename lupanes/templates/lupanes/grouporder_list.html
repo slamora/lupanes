@@ -1,0 +1,43 @@
+{% extends "lupanes/base.html" %}
+
+{% block main %}
+<div class="d-flex justify-content-between align-items-center">
+  <h1>Pedidos abiertos</h1>
+  <a class="btn btn-primary" href="{% url 'lupanes:grouporder-new' %}">
+    <i class="fa-solid fa-plus"></i> Abrir pedido</a>
+</div>
+
+{% if object_list %}
+<div class="row mt-3">
+  {% for order in object_list %}
+  <div class="col-12 col-md-6 col-lg-4 mb-3">
+    <div class="card h-100">
+      <div class="card-body">
+        <h5 class="card-title">
+          <a href="{% url 'lupanes:grouporder-detail' order.pk %}">{{ order.title }}</a>
+        </h5>
+        <h6 class="card-subtitle mb-2 text-muted">{{ order.producer_name }}</h6>
+        <p class="card-text mb-1">
+          <i class="fa-regular fa-clock"></i>
+          Se cierra el {{ order.closing_date|date:"d/m/Y H:i" }}
+        </p>
+        {% if order.estimated_delivery_date %}
+        <p class="card-text small text-muted">
+          Llegada estimada: {{ order.estimated_delivery_date|date:"d/m/Y" }}
+        </p>
+        {% endif %}
+      </div>
+      <div class="card-footer bg-transparent">
+        <a class="btn btn-sm btn-success" href="{% url 'lupanes:grouporder-detail' order.pk %}">
+          Ver y participar</a>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<div class="alert alert-info mt-3" role="alert">
+  No hay pedidos abiertos ahora mismo. ¡Vuelve a mirar pronto o abre uno tú!
+</div>
+{% endif %}
+{% endblock main %}
