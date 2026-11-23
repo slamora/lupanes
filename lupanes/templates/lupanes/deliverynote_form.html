@@ -20,7 +20,10 @@
 {% else %}
 <h1>La compra de hoy</h1>
 
-<p>Hola, <span class="text-success">{{ request.user.username }}</span>. ¿No eres tú? <a href="{% url 'users:logout' %}">Pulsa para cambiar de nevera</a>.</p>
+<div class="">Hola, <span class="text-success">{{ request.user.username }}</span>. ¿No eres tú? <form action="{% url 'users:logout' %}" method="post" class="d-inline">
+  {% csrf_token %}
+  <button type="submit" class="btn btn-link p-0 m-0 align-baseline">Pulsa para cambiar de nevera</button>.
+</form></div>
 
 <table class="table table-striped">
   <thead>
